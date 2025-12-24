@@ -40,7 +40,18 @@ with col1:
     with st.expander("Patient Details", expanded=True):
         patient_name = st.text_input("Patient Name (optional)", placeholder="John Smith")
         practice_name = st.text_input("Practice Name (optional)", placeholder="BiteSoft Orthodontics")
-        patient_age = st.number_input("Patient Age (optional)", min_value=0, max_value=120, value=None, step=1)
+        patient_age_input = st.text_input("Patient Age (optional)", placeholder="e.g., 25", max_chars=3)
+        
+        patient_age = None
+        if patient_age_input:
+            if patient_age_input.isdigit():
+                age_value = int(patient_age_input)
+                if 0 <= age_value <= 200:
+                    patient_age = age_value
+                else:
+                    st.error("⚠️ Age must be between 0 and 200")
+            else:
+                st.error("⚠️ Age must contain only digits")
     
     with st.expander("Clinical Data", expanded=True):
         treatment_type = st.selectbox(
