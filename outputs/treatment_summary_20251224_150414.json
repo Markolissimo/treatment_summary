@@ -1,0 +1,26 @@
+{
+  "success": true,
+  "document": {
+    "title": "Kate's Braces Treatment Plan",
+    "summary": "Hey Kate! We're going to use traditional braces to focus on your upper teeth for about 7\u201310 months. Since it's a moderate case, we'll be checking your progress both remotely and with some in-clinic visits. There might be some attachments used along the way to help guide the process.",
+    "key_points": [
+      "Traditional braces for upper teeth",
+      "Treatment duration: 7\u201310 months",
+      "Moderate case with mixed monitoring",
+      "Some attachments may be used",
+      "Whitening is not included"
+    ],
+    "next_steps": [
+      "Attend the initial fitting appointment for your braces",
+      "Follow up on scheduled remote and in-clinic monitoring appointments",
+      "Reach out if you have any questions or concerns during treatment"
+    ],
+    "care_instructions": null
+  },
+  "metadata": {
+    "tokens_used": 1444,
+    "generation_time_ms": 4152,
+    "audience": "patient",
+    "tone": "casual"
+  }
+}

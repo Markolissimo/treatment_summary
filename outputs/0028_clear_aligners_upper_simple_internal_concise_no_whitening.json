@@ -1,0 +1,38 @@
+{
+  "success": true,
+  "document": {
+    "title": "Concise Internal Treatment Summary",
+    "summary": "Simple alignment case using clear aligners for the upper arch with an estimated duration of 4–6 months. Remote monitoring is planned with some attachments required.",
+    "key_points": [
+      "Treatment involves clear aligners for the upper arch.",
+      "Estimated treatment duration is 4–6 months.",
+      "Remote monitoring approach will be used.",
+      "Some attachments are required.",
+      "Whitening is not included."
+    ],
+    "next_steps": [
+      "Ensure remote monitoring setup is ready.",
+      "Prepare necessary attachments for treatment.",
+      "Schedule regular check-ins to monitor progress."
+    ],
+    "care_instructions": null
+  },
+  "metadata": {
+    "tokens_used": 1385,
+    "generation_time_ms": 2367,
+    "audience": "internal",
+    "tone": "concise",
+    "generated_at": "2025-12-24T16:55:19.472336"
+  },
+  "input_parameters": {
+    "treatment_type": "clear aligners",
+    "area_treated": "upper",
+    "duration_range": "4-6 months",
+    "case_difficulty": "simple",
+    "monitoring_approach": "remote",
+    "attachments": "some",
+    "whitening_included": false,
+    "audience": "internal",
+    "tone": "concise"
+  }
+}

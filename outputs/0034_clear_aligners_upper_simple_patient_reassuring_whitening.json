@@ -1,0 +1,37 @@
+{
+  "success": true,
+  "document": {
+    "title": "Upper Teeth Alignment with Clear Aligners",
+    "summary": "Your treatment plan involves using clear aligners to gently align your upper teeth. This process is anticipated to take about 4–6 months. We'll primarily monitor your progress remotely, minimizing the need for frequent office visits. To help achieve the desired results, attachments will be used on some teeth. Additionally, your plan includes whitening to enhance your overall smile.",
+    "key_points": [
+      "Clear aligners for upper teeth alignment",
+      "Expected duration is 4–6 months",
+      "Progress monitored remotely",
+      "Extensive attachments to aid alignment",
+      "Whitening is included"
+    ],
+    "next_steps": [
+      "Begin treatment with initial aligner fitting",
+      "Schedule remote monitoring sessions as needed"
+    ],
+    "care_instructions": null
+  },
+  "metadata": {
+    "tokens_used": 1415,
+    "generation_time_ms": 2946,
+    "audience": "patient",
+    "tone": "reassuring",
+    "generated_at": "2025-12-24T16:55:43.915547"
+  },
+  "input_parameters": {
+    "treatment_type": "clear aligners",
+    "area_treated": "upper",
+    "duration_range": "4-6 months",
+    "case_difficulty": "simple",
+    "monitoring_approach": "remote",
+    "attachments": "extensive",
+    "whitening_included": true,
+    "audience": "patient",
+    "tone": "reassuring"
+  }
+}

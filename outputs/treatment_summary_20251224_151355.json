@@ -1,0 +1,27 @@
+{
+  "success": true,
+  "document": {
+    "title": "Moderate Upper Arch Braces Treatment",
+    "summary": "Moderate case involving traditional braces on the upper arch with an estimated duration of 7-10 months. A mixed monitoring approach will be used, with some attachments required. Whitening is not included in this treatment plan.",
+    "key_points": [
+      "Traditional braces treatment for upper arch",
+      "Estimated treatment duration: 7-10 months",
+      "Moderate case complexity",
+      "Mixed monitoring approach",
+      "Some attachments required",
+      "Whitening not included"
+    ],
+    "next_steps": [
+      "Schedule initial fitting for braces",
+      "Plan monitoring appointments",
+      "Ensure patient is aware of care instructions"
+    ],
+    "care_instructions": null
+  },
+  "metadata": {
+    "tokens_used": 1414,
+    "generation_time_ms": 3841,
+    "audience": "internal",
+    "tone": "concise"
+  }
+}

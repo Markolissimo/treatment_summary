@@ -1,0 +1,27 @@
+{
+  "success": true,
+  "document": {
+    "title": "Moderate Upper Arch Braces Treatment",
+    "summary": "This treatment plan for Alex involves the use of traditional braces to adjust the upper teeth. It is anticipated to take approximately 7-10 months to complete. The case is of moderate complexity, requiring a mixed approach to monitoring, which will include both remote and in-office visits. Some attachments will be utilized to assist with alignment adjustments. Whitening is not included in this treatment plan.",
+    "key_points": [
+      "Traditional braces for upper teeth",
+      "Estimated treatment duration of 7-10 months",
+      "Moderate case complexity",
+      "Mixed monitoring approach",
+      "Some attachments required",
+      "Whitening not included"
+    ],
+    "next_steps": [
+      "Schedule initial fitting appointment for braces",
+      "Plan monitoring schedule with a mix of remote and in-office visits",
+      "Confirm attachment placement as needed during treatment"
+    ],
+    "care_instructions": null
+  },
+  "metadata": {
+    "tokens_used": 1455,
+    "generation_time_ms": 4028,
+    "audience": "internal",
+    "tone": "reassuring"
+  }
+}

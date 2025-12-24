@@ -1,0 +1,38 @@
+{
+  "success": true,
+  "document": {
+    "title": "Simple Upper Arch Aligner Treatment",
+    "summary": "This treatment involves using clear aligners to address alignment in the upper arch. The case is straightforward, with an expected duration of 4–6 months. Progress will be monitored remotely, ensuring convenience and efficiency. Attachments are not required for this treatment.",
+    "key_points": [
+      "Clear aligners for upper arch alignment",
+      "Simple treatment case",
+      "Expected duration: 4–6 months",
+      "Remote monitoring approach",
+      "No attachments required"
+    ],
+    "next_steps": [
+      "Initiate treatment planning",
+      "Set up remote monitoring schedule",
+      "Communicate treatment timeline to patient"
+    ],
+    "care_instructions": null
+  },
+  "metadata": {
+    "tokens_used": 1394,
+    "generation_time_ms": 1959,
+    "audience": "internal",
+    "tone": "reassuring",
+    "generated_at": "2025-12-24T16:54:28.294210"
+  },
+  "input_parameters": {
+    "treatment_type": "clear aligners",
+    "area_treated": "upper",
+    "duration_range": "4-6 months",
+    "case_difficulty": "simple",
+    "monitoring_approach": "remote",
+    "attachments": "none",
+    "whitening_included": false,
+    "audience": "internal",
+    "tone": "reassuring"
+  }
+}

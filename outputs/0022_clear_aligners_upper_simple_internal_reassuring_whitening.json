@@ -1,0 +1,38 @@
+{
+  "success": true,
+  "document": {
+    "title": "Upper Arch Aligner Treatment Plan",
+    "summary": "This treatment plan involves using clear aligners to adjust the upper teeth. The process is anticipated to take approximately 4-6 months. Given the simplicity of the case, progress will be primarily monitored remotely, minimizing the need for in-office visits. Attachments will be used to facilitate specific tooth movements. Whitening is included as part of this treatment plan, adding an extra benefit to enhance your smile.",
+    "key_points": [
+      "Clear aligners for upper teeth only",
+      "Expected duration: 4-6 months",
+      "Remote monitoring with minimal in-office visits",
+      "Some attachments to aid tooth movement",
+      "Whitening included in the treatment plan"
+    ],
+    "next_steps": [
+      "Review patient progress through remote monitoring channels",
+      "Ensure patient is informed about the use of attachments and their role",
+      "Prepare whitening materials for inclusion at the appropriate stage of treatment"
+    ],
+    "care_instructions": null
+  },
+  "metadata": {
+    "tokens_used": 1448,
+    "generation_time_ms": 3121,
+    "audience": "internal",
+    "tone": "reassuring",
+    "generated_at": "2025-12-24T16:54:57.386251"
+  },
+  "input_parameters": {
+    "treatment_type": "clear aligners",
+    "area_treated": "upper",
+    "duration_range": "4-6 months",
+    "case_difficulty": "simple",
+    "monitoring_approach": "remote",
+    "attachments": "some",
+    "whitening_included": true,
+    "audience": "internal",
+    "tone": "reassuring"
+  }
+}

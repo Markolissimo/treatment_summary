@@ -1,0 +1,38 @@
+{
+  "success": true,
+  "document": {
+    "title": "Upper Arch Aligner Treatment Plan",
+    "summary": "This is a simple case involving the use of clear aligners to treat the upper arch. The treatment is expected to last between 4 to 6 months. Monitoring will be primarily remote, and extensive attachments will be utilized to aid in the alignment process. Whitening is not included in this treatment plan.",
+    "key_points": [
+      "Clear aligners for upper arch",
+      "Simple case expected to last 4-6 months",
+      "Remote monitoring approach",
+      "Extensive attachments required",
+      "No whitening included"
+    ],
+    "next_steps": [
+      "Schedule initial fitting for aligners",
+      "Set up remote monitoring schedule",
+      "Prepare for attachment placement"
+    ],
+    "care_instructions": null
+  },
+  "metadata": {
+    "tokens_used": 1405,
+    "generation_time_ms": 1921,
+    "audience": "internal",
+    "tone": "casual",
+    "generated_at": "2025-12-24T16:56:24.839019"
+  },
+  "input_parameters": {
+    "treatment_type": "clear aligners",
+    "area_treated": "upper",
+    "duration_range": "4-6 months",
+    "case_difficulty": "simple",
+    "monitoring_approach": "remote",
+    "attachments": "extensive",
+    "whitening_included": false,
+    "audience": "internal",
+    "tone": "casual"
+  }
+}

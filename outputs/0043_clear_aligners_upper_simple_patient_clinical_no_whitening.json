@@ -1,0 +1,38 @@
+{
+  "success": true,
+  "document": {
+    "title": "Clear Aligner Treatment Plan - Upper Teeth",
+    "summary": "This treatment involves using clear aligners to improve the alignment of your upper teeth. The expected duration for this treatment is approximately 4–6 months. Progress will be primarily monitored remotely, minimizing the need for frequent in-office visits. Extensive attachments are planned to facilitate the movement of your teeth.",
+    "key_points": [
+      "Clear aligners will be used for the upper teeth.",
+      "Estimated treatment duration is 4–6 months.",
+      "Remote monitoring will be used to track progress.",
+      "Extensive attachments are necessary for tooth movement.",
+      "Whitening is not included."
+    ],
+    "next_steps": [
+      "Begin treatment with initial aligner fitting.",
+      "Schedule remote check-ins to monitor progress.",
+      "Follow instructions for aligner wear and care."
+    ],
+    "care_instructions": null
+  },
+  "metadata": {
+    "tokens_used": 1426,
+    "generation_time_ms": 3300,
+    "audience": "patient",
+    "tone": "clinical",
+    "generated_at": "2025-12-24T16:56:18.844666"
+  },
+  "input_parameters": {
+    "treatment_type": "clear aligners",
+    "area_treated": "upper",
+    "duration_range": "4-6 months",
+    "case_difficulty": "simple",
+    "monitoring_approach": "remote",
+    "attachments": "extensive",
+    "whitening_included": false,
+    "audience": "patient",
+    "tone": "clinical"
+  }
+}

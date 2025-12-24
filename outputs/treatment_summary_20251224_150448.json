@@ -1,0 +1,26 @@
+{
+  "success": true,
+  "document": {
+    "title": "Treatment Plan for Kate's Upper Teeth",
+    "summary": "This treatment involves using traditional braces to adjust the alignment of your upper teeth. The expected duration is between 7 to 10 months, and progress will be monitored through a mix of remote and in-person check-ins. Some attachments may be used to assist with tooth movement. Whitening is not included in this treatment package.",
+    "key_points": [
+      "Traditional braces for upper teeth",
+      "Expected duration: 7-10 months",
+      "Mixed monitoring approach",
+      "Some attachments may be used",
+      "Whitening not included"
+    ],
+    "next_steps": [
+      "Schedule initial fitting for braces",
+      "Plan monitoring appointments",
+      "Discuss any concerns or questions with your dental team"
+    ],
+    "care_instructions": null
+  },
+  "metadata": {
+    "tokens_used": 1432,
+    "generation_time_ms": 4016,
+    "audience": "patient",
+    "tone": "concise"
+  }
+}

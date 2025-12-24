@@ -1,0 +1,37 @@
+{
+  "success": true,
+  "document": {
+    "title": "Upper Teeth Alignment with Remote Monitoring",
+    "summary": "Your treatment plan involves using clear aligners to adjust the alignment of your upper teeth. This is considered a straightforward case, and it's expected to take about 4–6 months to complete. Most of the progress will be monitored remotely, which means fewer in-office visits. To help achieve the desired movement, we'll be using attachments on your teeth. While whitening is not included in this package, the focus is on ensuring a smooth and effective alignment process with clear aligners.",
+    "key_points": [
+      "Clear aligners will be used for upper teeth alignment.",
+      "Expected treatment duration is 4-6 months.",
+      "Remote monitoring will track progress, reducing the need for in-office visits.",
+      "Extensive use of attachments will aid in tooth movement."
+    ],
+    "next_steps": [
+      "Begin aligner treatment as scheduled.",
+      "Participate in remote monitoring appointments.",
+      "Follow any additional guidance provided by your dental care team."
+    ],
+    "care_instructions": null
+  },
+  "metadata": {
+    "tokens_used": 1461,
+    "generation_time_ms": 3627,
+    "audience": "patient",
+    "tone": "reassuring",
+    "generated_at": "2025-12-24T16:56:14.530283"
+  },
+  "input_parameters": {
+    "treatment_type": "clear aligners",
+    "area_treated": "upper",
+    "duration_range": "4-6 months",
+    "case_difficulty": "simple",
+    "monitoring_approach": "remote",
+    "attachments": "extensive",
+    "whitening_included": false,
+    "audience": "patient",
+    "tone": "reassuring"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "success": true,
+  "document": {
+    "title": "Upper Jaw Braces Treatment",
+    "summary": "Kate's treatment involves using traditional braces to address the alignment of her upper teeth. The expected duration for this moderate case is approximately 7\u201310 months. A mixed monitoring approach will be utilized, combining both in-office visits and remote assessments to ensure optimal progress. Some attachments may be used to assist with specific tooth movements during the course of treatment. Whitening is not included in this plan.",
+    "key_points": [
+      "Traditional braces for upper teeth",
+      "Expected duration of 7-10 months",
+      "Moderate case complexity",
+      "Mixed monitoring approach",
+      "Some attachments may be used",
+      "Whitening not included"
+    ],
+    "next_steps": [
+      "Schedule initial appointment for brace placement",
+      "Discuss monitoring schedule with the orthodontist",
+      "Attend regular check-ups as advised"
+    ],
+    "care_instructions": null
+  },
+  "metadata": {
+    "tokens_used": 1451,
+    "generation_time_ms": 5398,
+    "audience": "patient",
+    "tone": "clinical"
+  }
+}

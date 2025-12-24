@@ -1,0 +1,38 @@
+{
+  "success": true,
+  "document": {
+    "title": "Simple Upper Arch Aligner Case",
+    "summary": "Simple aligner case focused on the upper arch. Expected treatment duration is 4–6 months with remote monitoring. No attachments required. Whitening included as part of the treatment package.",
+    "key_points": [
+      "Simple case focusing on upper arch alignment.",
+      "Expected duration: 4-6 months.",
+      "Monitoring will be conducted remotely.",
+      "No attachments needed.",
+      "Whitening included."
+    ],
+    "next_steps": [
+      "Initiate treatment setup for clear aligners.",
+      "Schedule remote monitoring checkpoints.",
+      "Ensure whitening is prepared for inclusion in the treatment package."
+    ],
+    "care_instructions": null
+  },
+  "metadata": {
+    "tokens_used": 1388,
+    "generation_time_ms": 2916,
+    "audience": "internal",
+    "tone": "clinical",
+    "generated_at": "2025-12-24T16:54:03.013950"
+  },
+  "input_parameters": {
+    "treatment_type": "clear aligners",
+    "area_treated": "upper",
+    "duration_range": "4-6 months",
+    "case_difficulty": "simple",
+    "monitoring_approach": "remote",
+    "attachments": "none",
+    "whitening_included": true,
+    "audience": "internal",
+    "tone": "clinical"
+  }
+}

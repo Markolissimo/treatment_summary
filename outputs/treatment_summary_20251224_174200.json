@@ -1,0 +1,41 @@
+{
+  "success": true,
+  "document": {
+    "title": "Clear Aligner Treatment Plan for Lower Teeth",
+    "summary": "Abraham, your treatment involves using clear aligners to straighten your lower teeth over an estimated 4\u20136 months. As this is a moderate case, it will require extensive attachments and regular in-clinic monitoring to ensure the best possible results.",
+    "key_points": [
+      "Clear aligners for lower teeth",
+      "Moderate case with extensive attachments",
+      "Estimated duration: 4\u20136 months",
+      "In-clinic monitoring required"
+    ],
+    "next_steps": [
+      "Attend scheduled in-clinic appointments for monitoring",
+      "Discuss any questions with your dentist at Bitesoft"
+    ],
+    "care_instructions": null
+  },
+  "metadata": {
+    "tokens_used": 1431,
+    "generation_time_ms": 3193,
+    "audience": "patient",
+    "tone": "concise"
+  },
+  "input_parameters": {
+    "treatment_type": "clear aligners",
+    "area_treated": "lower",
+    "duration_range": "4-6 months",
+    "case_difficulty": "moderate",
+    "monitoring_approach": "in-clinic",
+    "attachments": "extensive",
+    "whitening_included": false,
+    "audience": "patient",
+    "tone": "concise",
+    "patient_name": "Abraham",
+    "practice_name": "Bitesoft",
+    "patient_age": 43,
+    "dentist_note": "Blah blah blah"
+  },
+  "is_edited": true,
+  "edited_summary": "Your treatment involves the use of lingual braces on the lower teeth, designed to improve alignment over an estimated period of 6\u20138 months. This type of braces is placed on the inner side of the teeth, making them less visible. Due to the moderate complexity of your case, you'll have in-clinic visits for monitoring to ensure everything progresses smoothly. Extensive attachments will be utilized to assist with the necessary tooth movements. Additionally, whitening is included as part of your treatment plan to enhance your smile."
+}

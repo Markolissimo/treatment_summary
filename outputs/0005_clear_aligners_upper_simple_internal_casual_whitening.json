@@ -1,0 +1,38 @@
+{
+  "success": true,
+  "document": {
+    "title": "Simple Upper Arch Aligner Treatment",
+    "summary": "We're focusing on aligning the upper teeth using clear aligners, which is expected to take about 4–6 months. This is a straightforward case with progress primarily checked remotely. No attachments are needed, and whitening is part of the treatment package.",
+    "key_points": [
+      "Clear aligners for upper teeth",
+      "Expected duration: 4–6 months",
+      "Simple case with remote monitoring",
+      "No attachments required",
+      "Whitening included"
+    ],
+    "next_steps": [
+      "Begin treatment planning",
+      "Schedule remote monitoring sessions",
+      "Prepare whitening kit"
+    ],
+    "care_instructions": null
+  },
+  "metadata": {
+    "tokens_used": 1388,
+    "generation_time_ms": 1850,
+    "audience": "internal",
+    "tone": "casual",
+    "generated_at": "2025-12-24T16:53:55.775234"
+  },
+  "input_parameters": {
+    "treatment_type": "clear aligners",
+    "area_treated": "upper",
+    "duration_range": "4-6 months",
+    "case_difficulty": "simple",
+    "monitoring_approach": "remote",
+    "attachments": "none",
+    "whitening_included": true,
+    "audience": "internal",
+    "tone": "casual"
+  }
+}

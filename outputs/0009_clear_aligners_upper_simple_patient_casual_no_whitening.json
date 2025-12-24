@@ -1,0 +1,38 @@
+{
+  "success": true,
+  "document": {
+    "title": "Simple Upper Teeth Alignment with Clear Aligners",
+    "summary": "We're using clear aligners to gently straighten your upper teeth over the next 4–6 months. Most of your progress will be tracked remotely, so you won't need to come in for frequent appointments. This plan doesn't include whitening, but it's focused on giving you a great alignment experience.",
+    "key_points": [
+      "Clear aligners for upper teeth",
+      "Estimated duration of 4-6 months",
+      "Remote monitoring setup",
+      "No attachments needed",
+      "Whitening not included"
+    ],
+    "next_steps": [
+      "Start wearing your aligners as instructed by your dental care provider",
+      "Attend scheduled remote check-ins to track progress",
+      "Reach out to the dental office if you have any questions or concerns during treatment"
+    ],
+    "care_instructions": null
+  },
+  "metadata": {
+    "tokens_used": 1422,
+    "generation_time_ms": 3208,
+    "audience": "patient",
+    "tone": "casual",
+    "generated_at": "2025-12-24T16:54:10.072683"
+  },
+  "input_parameters": {
+    "treatment_type": "clear aligners",
+    "area_treated": "upper",
+    "duration_range": "4-6 months",
+    "case_difficulty": "simple",
+    "monitoring_approach": "remote",
+    "attachments": "none",
+    "whitening_included": false,
+    "audience": "patient",
+    "tone": "casual"
+  }
+}

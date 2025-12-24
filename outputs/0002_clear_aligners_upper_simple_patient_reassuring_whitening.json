@@ -1,0 +1,38 @@
+{
+  "success": true,
+  "document": {
+    "title": "Clear Aligner Treatment Plan",
+    "summary": "Based on your assessment, this is a straightforward alignment case focusing on your upper teeth using clear aligners. The treatment is expected to take approximately 4–6 months, with progress primarily monitored remotely, minimizing the need for frequent in-office visits. This approach is generally smooth and predictable, and we'll support you through each step to keep things on track. Whitening is included as part of your overall smile plan, enhancing your results.",
+    "key_points": [
+      "Simple alignment case for upper teeth",
+      "Treatment duration estimated at 4–6 months",
+      "Remote monitoring for convenience",
+      "No attachments required",
+      "Whitening included in plan"
+    ],
+    "next_steps": [
+      "Begin treatment with initial aligner fitting",
+      "Schedule regular remote check-ins",
+      "Contact the office if any issues arise"
+    ],
+    "care_instructions": null
+  },
+  "metadata": {
+    "tokens_used": 1434,
+    "generation_time_ms": 3359,
+    "audience": "patient",
+    "tone": "reassuring",
+    "generated_at": "2025-12-24T16:53:45.558479"
+  },
+  "input_parameters": {
+    "treatment_type": "clear aligners",
+    "area_treated": "upper",
+    "duration_range": "4-6 months",
+    "case_difficulty": "simple",
+    "monitoring_approach": "remote",
+    "attachments": "none",
+    "whitening_included": true,
+    "audience": "patient",
+    "tone": "reassuring"
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "success": true,
+  "document": {
+    "title": "Internal Treatment Overview",
+    "summary": "This is a simple alignment case focusing on the upper teeth using clear aligners. The treatment is expected to last about 4–6 months with remote monitoring to track progress effectively. Extensive attachments are planned to assist with the alignment process.",
+    "key_points": [
+      "Simple alignment case for upper teeth",
+      "Clear aligners used",
+      "Estimated duration: 4–6 months",
+      "Remote monitoring approach",
+      "Extensive attachments required",
+      "Whitening not included"
+    ],
+    "next_steps": [
+      "Prepare aligner sets for upper teeth treatment",
+      "Ensure remote monitoring setup is in place",
+      "Plan for attachment placement during initial appointments"
+    ],
+    "care_instructions": null
+  },
+  "metadata": {
+    "tokens_used": 1400,
+    "generation_time_ms": 2920,
+    "audience": "internal",
+    "tone": "reassuring",
+    "generated_at": "2025-12-24T16:56:28.798219"
+  },
+  "input_parameters": {
+    "treatment_type": "clear aligners",
+    "area_treated": "upper",
+    "duration_range": "4-6 months",
+    "case_difficulty": "simple",
+    "monitoring_approach": "remote",
+    "attachments": "extensive",
+    "whitening_included": false,
+    "audience": "internal",
+    "tone": "reassuring"
+  }
+}
