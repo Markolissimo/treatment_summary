@@ -1,0 +1,263 @@
+﻿Clinical Documentation Automation
+
+
+
+
+Prepared for Alexis Withers
+
+
+
+
+________________
+
+
+Version Number        2.0
+Effective Date                December 17, 2025  
+
+
+Proof of Concept (PoC) Main Goals
+The goal of this Phase 1 project is to engineer an AI-powered documentation layer for the BiteSoft SaaS platform that automates the generation of clinical records. This system aims to decouple clinical throughput from administrative friction by generating Treatment Summaries, Insurance-Ready Summaries, and Progress Notes using structured case data.
+Input information
+We will leverage the following inputs for development:
+* Structured Case Data: Existing patient metadata (Age, Case Tier, Malocclusion metrics) via the BiteSoft Portal API.
+* CDT Mapping Rules: Business logic provided by BiteSoft (e.g., "Tier 3 + Adult = D8090").
+* Design Assets: BiteSoft branding guidelines (logos, color codes) for PDF generation.
+Note: Additional predictive capabilities and PMS write-backs can be added in future phases based on the successful demonstration of these fundamentals.
+________________
+Roadmap
+We suggest using the following technology stack for the Phase 1 MVP:
+* Frontend: React.js (integrated into existing portal)
+* Backend: Python (FastAPI)
+* AI Engine: OpenAI API (GPT-4o or GPT-5) with Structured Outputs
+* Rules Engine: Python-based Rule Engine (e.g., rule-engine or json-logic)
+* PDF Engine: WeasyPrint with Jinja2 templating
+Why this stack?
+* Development Speed: FastAPI + Pydantic allows us to build type-safe APIs 40% faster than traditional Node.js setups.
+* Efficiency: Using sqladmin eliminates the need to build a custom Admin Frontend, saving development time.
+* HIPAA Compliance: Capable of Zero Data Retention (ZDR) configuration with OpenAI.   
+Integration Constraints
+To ensure seamless adoption and security, the system will strictly adhere to the following integration requirements:
+* Portal Integration: Connection via REST API; the BiteSoft Portal remains the single source of truth for all patient data.
+* Authentication: No separate user system. We will leverage existing portal authentication (e.g., passing auth tokens), generating drafts on behalf of the logged-in provider.
+________________
+Technical Approach
+To achieve our goal, we will take a structured "Human-in-the-Loop" (HITL) approach, focusing on safety, compliance, and ease of use.
+1. Decoupled Logic Layer: We will implement a dedicated Python Rules Engine backed by PostgreSQL. This allows Admins to update rules, set priority orders, and define fallback behaviors without redeploying the software.
+2. Structured AI Pipelines: We will utilize OpenAI's "Structured Outputs" to force the LLM to adhere to strict JSON schemas (using Pydantic models), ensuring that generated narratives are always formatted correctly for the PDF renderer.
+3. Secure Document Generation: PDF generation will occur on the server side using WeasyPrint. This ensures that the final output is consistent and that PII handling is centralized and logging is immutable.
+4. Admin Control Plane: A lightweight Admin UI will be built to manage the CDT mapping rules, ensuring BiteSoft retains control over the "intelligence" of the system.
+To achieve the reduced timeline, we have made the following scope adjustments:
+* Replaced Custom Admin UI with sqladmin: Instead of building a custom "Rule Builder" interface, we will use a library that auto-generates an admin panel from our database models. It is functional and secure but looks "generic" rather than branded.
+* Standardized PDF Layouts: We will use a clean, standard typographic layout for PDFs. We will not do pixel-perfect "print design" iterations.
+* Strict "Happy Path" Testing: We assume the provided API data is clean. We will handle errors gracefully, but we won't build complex data-cleaning pipelines.
+
+
+Step 1: Discovery & Requirements Freeze (4-8 hrs)
+Activities
+* Confirm final doc formats and required input fields for all document types.
+* Establish final input JSON examples from Portal API.
+* Initialize FastAPI project structure and deployment scaffold.
+Deliverables
+* Finalized input schema(s) and output JSON Schemas (v1).
+* Prompting policy guidelines (defining what the AI must/must not do).
+Constraint:  Client provides required mappings/templates on Day 1.
+Step 2: Schema & Prompt Template Design (18–20 hours)
+Activities
+Activities
+* Implement Pydantic models for:
+   * Treatment Summary
+   * Insurance-Ready Summary
+   * Progress Notes
+* Build prompt templates (few-shot) to produce strictly-valid JSON.
+* Implement validation pipeline:
+   * JSON parsing + Pydantic validation
+   * Minimal “repair” pass only for minor formatting errors
+* Enforce “No-Novel-Facts” behavior: missing inputs must be flagged as unknown, not invented.
+Deliverables
+* Prompt templates (v1).
+* Pydantic Models for each document type (v1).
+* AI generation endpoints (draft output).
+Step 3:  CDT Rules Engine + Admin Workflow (12-16 hours)
+Activities
+* Build DB-backed CDT mapping tables and evaluation logic:
+   * Tier → treatment category → CDT code (Adult/Adolescent)
+   * Priority ordering
+   * Graceful no-match behavior
+* Support optional codes list as admin-editable entries.
+* Install/configure sqladmin for CRUD management.
+Deliverables
+* CDT mapping engine (deterministic) and admin-editable storage.
+* Admin panel available for rule management.
+Step 4: Portal Integration & Dentist Review UX (16–18 hours)
+Activities
+* Implement portal-embedded workflow:
+   * Generate → Preview/Edit → Confirm → Download PDF
+* Insurance Summary view:
+   * Suggested CDT codes displayed as removable “chips.”
+   * Optional codes toggled manually.
+* Confirmation gate stores User ID + Timestamp + Document Version.
+Deliverables
+* End-to-end generation flow in a portal (PoC).
+* Secure Audit Logging service.
+Step 5: PDF Templates + QA & Launch Readiness (10-12 hours)
+Activities
+* Implement standardized PDF templates per doc type.
+* Manual QA on ~10–15 cases.
+* Docker containerization for deployment
+Deliverables
+* PDF generation pipeline.
+* Minimal QA report (known limitations + next steps).
+* Docker-ready delivery.
+Total Estimation: 60-74 Hours (~2 Weeks)
+Deliverable
+Primary Features:
+1. AI-Drafted Documents (3 Types)
+   * Treatment Summary
+   * Insurance-Ready Summary (Letter of Medical Necessity style)
+   * Progress Notes
+2. Dynamic CDT Code Suggestions (Deterministic)
+   * Tier + Age-based CDT suggestions.
+   * Codes labeled: “Suggested – dentist must review/confirm.”
+   * Optional codes supported via manual toggles.
+3. Dentist Review Interface (HITL)
+   * Editable text area for drafts.
+   * Ability to remove/edit CDT codes for Insurance Summary.
+4. Admin Rules Management
+   * CRUD for CDT mapping rules and optional codes via sqladmin.
+   * Priority ordering supported.
+5. Audit-Ready Logging
+   * Store confirmation events with User ID + Timestamp + Document Version.
+________________
+Metrics & KPIs
+Quality & Safety
+* Schema validity rate (target: high, tracked per doc type)
+* Policy violation rate (must be near-zero; any violation is a P0)
+* “Novel fact” flag rate (statements without source mapping)
+Workflow impact
+* Clinician acceptance rate (draft approved with minor edits)
+* Edit distance (how much clinicians modify drafts)
+* Time saved per document (self-reported or measured)
+Operations
+* Generation latency (p50/p95)
+* Failure rate (timeouts, provider errors, validation failures)
+
+
+Risks and Dependencies
+Dependencies
+* Stable access to structured case fields needed for each doc type
+* Availability of CDT mapping rules, age cutoff, and optional code list
+* Approved disclaimers and compliance guidance for generated content
+* Portal integration support from the existing dev team
+Key risks and mitigations
+* Regulatory / safety risk: outputs interpreted as diagnosis or billing decisions
+   * Mitigation: hard policy filters + confirmation gate + UI disclaimers + audits
+* Inconsistent outputs across cases:
+   * Mitigation: strict JSON schemas + prompt/schema versioning + regression suite
+* Data gaps cause hallucinations:
+   * Mitigation: allowlist inputs + “missing_data” flags + force “unknown” rather than guessing
+* Provider output format drift:
+   * Mitigation: model gateway + validation + repair pass + fallback behavior
+* CDT suggestion risk:
+   * Mitigation: deterministic rules engine + clear labeling + clinician edit/confirm + no-match returns empty
+Cost Estimate
+Planned project team
+#
+	Role
+	Name
+	1
+	AI Tech Lead
+	Vladyslav K.
+https://my.visualcv.com/vladislav_k_ml/
+
+
+	2
+	AI Engineer
+	Volodymyr M. (as an option)TBD
+https://my.visualcv.com/volodymyr__m/
+
+
+	
+
+
+
+
+
+
+
+Rough Budget
+#
+	Feature/Role
+	Hourly rate, $
+	Hrs
+	Budget, $
+	1
+	AI Development
+	$
+	60-74 hrs
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	Total: 
+	
+
+	        
+* The project's timeline is about 2 weeks at a full-time commitment (40 hrs a week)
+                                           
+                
+Work approach:
+In our usual practice, we follow a Time & Materials (T&M) model using Upwork's autotracker. This approach is often more budget-friendly, as you pay only for the actual hours worked instead of a fixed-price estimate that includes a buffer for potential risks. It also ensures transparency, allowing you to track progress in real-time and providing greater flexibility to adjust to any changes in requirements without the need to renegotiate the terms.
+
+
+
+
+
+
+* Work process
+-  We prefer using Agile methodologies.
+                                                        
+   * -  Agile methodologies focus on faster development and delivery while maintaining reasonable flexibility and clear budget control.
+                                                        
+   * -  We value transparency, so we’ll be happy to grant you guest access to our internal project tracking system (JIRA) if you require it so that you can monitor work in real time.
+                                                        
+   *                                                                                                          
+   *    * General Terms
+                                                        
+   * -  1. Team composition proposal: 1 Engineer
+                                                        
+   * -  2. Payment terms: Upwork contract.
+                                                        
+   * -  3. Start date: 1-2 business days after getting the contract agreed from you on Upwork.
+                                                        
+   * -  4. All the rights for the code are owned by the Client immediately after the corresponding payments are made.
+Contacts
+
+
+The Services under this proposal shall be performed during the following business hours: 10am — 7pm EET/EEST.
+
+
+
+
+Account Executive - Viktoriia Bieliaieva
+e-mail:  viktoriia.bieliaieva@litslink.com  mobile/WhatsApp: +38-050-987-27-34
+
+
+
+
+Copyright © LITSLINK | All rights reserved | private and confidential

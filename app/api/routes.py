@@ -15,6 +15,7 @@ from app.schemas.placeholders import (
     ProgressNotesResponse,
 )
 from app.services.openai_service import generate_treatment_summary
+from app.services.cdt_service import select_cdt_codes
 
 router = APIRouter()
 
@@ -39,9 +40,20 @@ async def create_treatment_summary(
     communication guidelines.
     """
     try:
-        result = await generate_treatment_summary(request)
+        result = await generate_treatment_summary(request, session=session)
 
-        await log_generation(
+        # Select CDT codes if tier and patient_age are provided
+        cdt_result = None
+        if request.tier or request.patient_age:
+            cdt_result = await select_cdt_codes(
+                session=session,
+                tier=request.tier.value if request.tier else None,
+                patient_age=request.patient_age,
+                diagnostic_assets=None,  # TODO: Add diagnostic_assets to request schema if needed
+                retainers_included=False,  # TODO: Add retainers_included to request schema if needed
+            )
+
+        audit_entry = await log_generation(
             session=session,
             user_id=user_id,
             document_type="treatment_summary",
@@ -50,6 +62,9 @@ async def create_treatment_summary(
             tokens_used=result.tokens_used,
             generation_time_ms=result.generation_time_ms,
             status="success",
+            seed=result.seed,
+            is_regenerated=request.is_regeneration or False,
+            previous_version_uuid=request.previous_version_uuid,
         )
 
         return TreatmentSummaryResponse(
@@ -60,7 +75,13 @@ async def create_treatment_summary(
                 "generation_time_ms": result.generation_time_ms,
                 "audience": request.audience.value,
                 "tone": request.tone.value,
+                "seed": result.seed,
             },
+            uuid=audit_entry.id,
+            is_regenerated=request.is_regeneration or False,
+            previous_version_uuid=request.previous_version_uuid,
+            seed=result.seed,
+            cdt_codes=cdt_result.to_dict() if cdt_result else None,
         )
 
     except Exception as e:

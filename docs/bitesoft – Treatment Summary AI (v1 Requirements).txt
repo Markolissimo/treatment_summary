@@ -1,0 +1,206 @@
+﻿bitesoft – Treatment Summary AI (v1 Requirements)
+________________
+
+
+1. Purpose of the Feature
+What this feature is
+The Treatment Summary AI generates a clear, patient-friendly explanation of an aligner treatment plan using structured inputs that are provided or approved by the dentist.
+It is designed to support patient communication and internal documentation within the provider portal.
+What this feature is NOT
+* It does not diagnose
+
+* It does not decide treatment
+
+* It does not generate staging or clinical plans
+
+* It does not guarantee outcomes
+
+* It does not infer details beyond the provided inputs
+
+* It does not provide pricing or financial information
+
+The dentist remains the clinical decision-maker at all times.
+________________
+
+
+2. Example Treatment Summaries
+(Illustrative examples of tone, structure, and quality — based only on supplied inputs)
+________________
+
+
+Example 1 — Patient | Reassuring
+Based on your assessment, this is a mild alignment case that can be treated using clear aligners across both the upper and lower teeth.
+Treatment is expected to take approximately 4–6 months, with most progress monitored remotely to reduce the need for frequent in-office visits.
+This type of treatment is generally smooth and predictable, and we’ll guide you through each stage to ensure things stay on track.
+This treatment also includes whitening as part of your overall smile plan.
+________________
+
+
+Example 2 — Patient | Concise
+This treatment uses clear aligners to straighten both upper and lower teeth.
+Estimated treatment time is 4–6 months, with progress primarily monitored remotely.
+Whitening is included as part of your treatment package.
+________________
+
+
+Example 3 — Patient | Casual
+We’ll be using clear aligners to gently straighten your teeth over about 4–6 months.
+Most of your progress will be checked remotely, with in-clinic visits only if needed.
+Whitening is included as part of your overall treatment.
+________________
+
+
+Example 4 — Patient | Informative (Moderate case)
+This treatment focuses on improving alignment using clear aligners.
+Treatment is expected to take around 6–9 months and will involve a combination of remote monitoring and occasional in-clinic reviews.
+Attachments may be used to help guide certain tooth movements throughout treatment.
+Whitening may be included as part of your treatment plan, depending on your practice’s offering.
+________________
+
+
+Example 5 — Internal | Clinical (Dentist / Staff)
+Moderate aligner case involving both arches. Estimated duration 6–9 months. Mixed monitoring approach planned with attachments required. Whitening included.
+________________
+
+
+3. Audience & Tone Controls
+Audience
+   * Patient
+
+   * Internal (dentist / staff)
+
+Tone options
+      * Concise – short, direct, plain language
+
+      * Casual – warm, conversational, professional
+
+      * Reassuring – calm, confidence-building, expectation-setting
+
+      * Clinical – neutral, professional, suitable for records
+
+Important:
+ Facts must never change between tones — only language style.
+________________
+
+
+4. Guardrails & Banned Language
+Hard restrictions
+         * No diagnosis or pathology language (e.g. diagnose, malocclusion, disease)
+
+         * No guarantees or promises of outcomes
+
+         * No legal or insurance claims
+
+         * No pricing, payment amounts, or financial terms
+
+         * No new clinical facts beyond provided inputs
+
+Patient-facing rules
+            * No jargon
+
+            * Explanatory only
+
+            * No directives or instructions
+
+Additional exclusions
+               * Patient-facing summaries must not mention elastics, auxiliaries, or conditional appliances unless explicitly instructed by the dentist.
+
+Allowed inclusions
+                  * Patient-facing summaries may reference included extras (e.g. whitening) where applicable, framed as inclusions only (not outcomes or guarantees).
+
+The AI must only rephrase and explain dentist-approved inputs.
+________________
+
+
+5. Inputs Provided to the AI (v1)
+For v1, inputs are auto-filled by the platform, with optional dentist override if required.
+Structured inputs include:
+                     * Treatment type (e.g. clear aligners)
+
+                     * Area treated (upper / lower / both)
+
+                     * Estimated duration (range)
+
+                     * Case difficulty (simple / moderate / complex – high-level only)
+
+                     * Monitoring approach (remote / mixed / in-clinic)
+
+                     * Attachments (none / some / extensive)
+
+                     * Whitening included (true / false)
+
+                     * Optional short dentist note (1–2 lines)
+
+                     * Audience (patient / internal)
+
+                     * Tone
+
+Dentists do not need to complete a long form.
+Most cases should require zero manual input.
+________________
+
+
+6. Output & Patient Email Behaviour (v1)
+Output
+                        * AI generates editable text only
+
+                        * Rendered inline within the existing Treatment Plan Summary section
+
+                        * No standalone UI or separate AI page required
+
+Email behaviour FOR SADIGIT INDONESIA
+After generating the AI Treatment Summary, the dentist can send the summary to the patient via email from the same section.
+Email includes:
+                           * Patient-facing AI Treatment Summary
+
+                           * Patient’s 3D treatment plan link or preview
+
+                           * Short introductory message
+
+Email rules:
+                              * Sent from the practice / dentist email
+
+                              * Patient replies go directly to the practice inbox
+
+                              * bitesoft does not manage replies or conversations in v1
+
+Pricing note:
+                                 * Pricing and payment details are handled separately by the practice and are not included in the AI summary or email.
+
+________________
+
+
+7. Integration Expectations (v1)
+                                    * AI delivered via an API endpoint
+
+                                    * Input: structured case object
+
+                                    * Output: plain text
+
+                                    * UI and email sending handled by the existing provider portal
+
+                                    * Streamlit or demo UIs may be used for internal testing only, not production
+
+________________
+
+
+8. Summary
+The Treatment Summary AI is a clinical communication assistant, designed to help dentists clearly and consistently explain treatment plans while remaining safe, compliant, and aligned with real-world workflows.
+
+
+The v1 email template (copy/paste) SADIGIT
+This is what lives inside the portal as the default template:
+
+
+Subject: Your clear aligner treatment plan is ready 
+Body:
+Hey {{Patient First Name}},
+I hope you are well. As discussed, here’s an overview of your aligner treatment plan.
+{{AI_TREATMENT_SUMMARY}}
+You can also review your 3D treatment plan here:
+{{3D_TREATMENT_PLAN_LINK}}
+Once you’ve had a chance to review the plan, our team will reach out shortly to go through final pricing and next steps. If you have any questions please feel free to respond to this email.
+We can’t wait to get started on your journey.
+Kind regards,
+{{Dentist Name}}
+{{Practice Name}}

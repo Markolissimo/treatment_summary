@@ -3,8 +3,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import get_settings
-from app.db.database import init_db
+from app.db.database import init_db, async_engine as engine
 from app.api.routes import router as api_router
+from app.admin import setup_admin
 
 settings = get_settings()
 
@@ -62,6 +63,9 @@ app.add_middleware(
 
 # Include API routes
 app.include_router(api_router, prefix="/api/v1")
+
+# Setup admin panel
+setup_admin(app, engine)
 
 
 @app.get("/", tags=["Health"])

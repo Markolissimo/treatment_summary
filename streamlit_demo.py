@@ -11,15 +11,21 @@ Usage:
 import streamlit as st
 import requests
 import json
-from datetime import datetime
-
-import streamlit as st
-import requests
-import json
 import os
 from datetime import datetime
 
-API_BASE_URL = os.getenv("API_BASE_URL", st.secrets.get("API_BASE_URL", "http://localhost:8000"))
+API_BASE_URL = os.getenv("API_BASE_URL")
+if not API_BASE_URL:
+    try:
+        # Accessing st.secrets triggers file read, which might fail if no secrets file exists
+        if "API_BASE_URL" in st.secrets:
+            API_BASE_URL = st.secrets["API_BASE_URL"]
+    except Exception:
+        # Fallback if secrets file is missing or any other error
+        pass
+
+if not API_BASE_URL:
+    API_BASE_URL = "http://localhost:8000"
 
 st.set_page_config(
     page_title="BiteSoft AI - Treatment Summary Demo",
@@ -29,6 +35,14 @@ st.set_page_config(
 
 st.title("🦷 BiteSoft AI Treatment Summary Generator")
 st.markdown("**Demo Tool** - For validation and demonstration purposes only")
+
+# Admin panel link in sidebar
+with st.sidebar:
+    st.markdown("### 🔧 Admin Tools")
+    admin_url = f"{API_BASE_URL}/admin/audit-log/list"
+    st.markdown(f"[🏥 Open Admin Panel]({admin_url})")
+    st.caption("Manage CDT codes, rules, and view audit logs")
+    st.divider()
 
 st.divider()
 
@@ -54,6 +68,13 @@ with col1:
                 st.error("⚠️ Age must contain only digits")
     
     with st.expander("Clinical Data", expanded=True):
+        tier = st.selectbox(
+            "Case Tier (for CDT mapping)",
+            ["express", "mild", "moderate", "complex"],
+            index=2,
+            help="Used for automatic CDT code selection"
+        )
+        
         treatment_type = st.selectbox(
             "Treatment Type",
             ["clear aligners", "traditional braces", "lingual braces", "retainers"],
@@ -107,19 +128,46 @@ with col1:
             index=2
         )
     
-    generate_button = st.button("🚀 Generate Treatment Summary", type="primary", use_container_width=True)
+    current_inputs = {
+        "tier": tier,
+        "treatment_type": treatment_type,
+        "area_treated": area_treated,
+        "duration_range": duration_range,
+        "case_difficulty": case_difficulty,
+        "monitoring_approach": monitoring_approach,
+        "attachments": attachments,
+        "whitening_included": whitening_included,
+        "audience": audience,
+        "tone": tone,
+        "patient_name": patient_name,
+        "practice_name": practice_name,
+        "patient_age": patient_age,
+        "dentist_note": dentist_note,
+    }
+    
+    if "last_inputs" not in st.session_state:
+        st.session_state["last_inputs"] = None
+    
+    inputs_changed = st.session_state["last_inputs"] != current_inputs
+    
+    if "last_result" in st.session_state and not inputs_changed:
+        button_label = "🔄 Regenerate Treatment Summary"
+        is_regeneration = True
+    else:
+        button_label = "🚀 Generate Treatment Summary"
+        is_regeneration = False
+    
+    generate_button = st.button(button_label, type="primary", use_container_width=True)
 
 with col2:
     st.subheader("📄 Generated Summary")
     
     if generate_button:
-        if "last_result" in st.session_state:
-            del st.session_state["last_result"]
-        if "last_payload" in st.session_state:
-            del st.session_state["last_payload"]
+        spinner_text = "Regenerating treatment summary..." if is_regeneration else "Generating treatment summary..."
         
-        with st.spinner("Generating treatment summary..."):
+        with st.spinner(spinner_text):
             payload = {
+                "tier": tier,
                 "treatment_type": treatment_type,
                 "area_treated": area_treated,
                 "duration_range": duration_range,
@@ -140,6 +188,10 @@ with col2:
             if dentist_note:
                 payload["dentist_note"] = dentist_note
             
+            if is_regeneration and "last_result" in st.session_state:
+                payload["is_regeneration"] = True
+                payload["previous_version_uuid"] = st.session_state["last_result"].get("uuid")
+            
             try:
                 response = requests.post(
                     f"{API_BASE_URL}/api/v1/generate-treatment-summary",
@@ -154,11 +206,18 @@ with col2:
                     
                     st.session_state["last_result"] = result
                     st.session_state["last_payload"] = payload
+                    st.session_state["last_inputs"] = current_inputs
                     if "generation_count" not in st.session_state:
                         st.session_state["generation_count"] = 0
                     st.session_state["generation_count"] += 1
                     
-                    st.success("✅ Summary generated successfully!")
+                    if is_regeneration:
+                        st.toast("✅ Summary regenerated successfully!")
+                    else:
+                        st.toast("✅ Summary generated successfully!")
+                    
+                    # Rerun to update button state immediately
+                    st.rerun()
                     
                 else:
                     st.error(f"❌ Error: {response.status_code}")
@@ -190,8 +249,34 @@ with col2:
         if is_edited:
             st.info("✏️ Summary has been edited")
         
+        # Display CDT codes if available
+        if result.get("cdt_codes"):
+            st.markdown("---")
+            st.markdown("**🏥 CDT Code Suggestions**")
+            cdt_codes = result["cdt_codes"]
+            
+            if cdt_codes.get("primary_code"):
+                st.markdown(f"**Primary Code:** `{cdt_codes['primary_code']}`")
+                if cdt_codes.get("primary_description"):
+                    st.caption(cdt_codes["primary_description"])
+            
+            if cdt_codes.get("suggested_add_ons"):
+                st.markdown("**Suggested Add-ons:**")
+                for addon in cdt_codes["suggested_add_ons"]:
+                    st.markdown(f"- `{addon['code']}`: {addon['description']}")
+            
+            if cdt_codes.get("notes"):
+                st.caption(f"ℹ️ {cdt_codes['notes']}")
+        
         with st.expander("📊 Metadata"):
-            st.json(metadata)
+            metadata_display = metadata.copy()
+            if result.get("uuid"):
+                metadata_display["uuid"] = result["uuid"]
+            if result.get("is_regenerated"):
+                metadata_display["is_regenerated"] = result["is_regenerated"]
+            if result.get("previous_version_uuid"):
+                metadata_display["previous_version_uuid"] = result["previous_version_uuid"]
+            st.json(metadata_display)
         
         with st.expander("📋 Full JSON Response"):
             st.json(result)

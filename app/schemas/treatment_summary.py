@@ -46,6 +46,14 @@ class Tone(str, Enum):
     CLINICAL = "clinical"
 
 
+class CaseTier(str, Enum):
+    """Case tier for CDT code mapping."""
+    EXPRESS = "express"
+    MILD = "mild"
+    MODERATE = "moderate"
+    COMPLEX = "complex"
+
+
 class TreatmentSummaryRequest(BaseModel):
     """Input schema for treatment summary generation.
     
@@ -53,6 +61,19 @@ class TreatmentSummaryRequest(BaseModel):
     This contract may evolve as the portal UI is finalized.
     """
 
+    is_regeneration: Optional[bool] = Field(
+        default=False,
+        description="Whether this is a regeneration request",
+    )
+    previous_version_uuid: Optional[str] = Field(
+        default=None,
+        description="UUID of the previous version if regenerating",
+    )
+    tier: Optional[CaseTier] = Field(
+        default=None,
+        description="Case tier for CDT code mapping (express/mild/moderate/complex)",
+        examples=["moderate"],
+    )
     treatment_type: Optional[TreatmentType] = Field(
         default=TreatmentType.CLEAR_ALIGNERS,
         description="Type of orthodontic treatment",
@@ -159,4 +180,24 @@ class TreatmentSummaryResponse(BaseModel):
     metadata: dict = Field(
         default_factory=dict,
         description="Additional metadata about the generation",
+    )
+    uuid: Optional[str] = Field(
+        default=None,
+        description="Unique identifier for this generation",
+    )
+    is_regenerated: bool = Field(
+        default=False,
+        description="Whether this is a regenerated version",
+    )
+    previous_version_uuid: Optional[str] = Field(
+        default=None,
+        description="UUID of the previous version if this is a regeneration",
+    )
+    seed: Optional[int] = Field(
+        default=None,
+        description="Seed value used for this generation",
+    )
+    cdt_codes: Optional[dict] = Field(
+        default=None,
+        description="CDT code suggestions (primary_code, primary_description, suggested_add_ons, notes)",
     )

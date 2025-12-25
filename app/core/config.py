@@ -11,6 +11,11 @@ class Settings(BaseSettings):
     # OpenAI
     openai_api_key: str = ""
     openai_model: str = "gpt-4o"
+    
+    # LLM Seeds for reproducibility
+    treatment_summary_seed: int = 42
+    insurance_summary_seed: int = 42
+    progress_notes_seed: int = 42
 
     # Database
     database_url: str = "sqlite+aiosqlite:///./bitesoft_audit.db"

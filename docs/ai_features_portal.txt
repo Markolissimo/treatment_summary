@@ -1,0 +1,49 @@
+﻿sharing a starter Tier → CDT mapping so you can lay out the database/priority logic. Please treat this as an architecture scaffold, not final billing guidance (final codes will always be selected/approved and edited by the treating dentist and can vary by payer/state).
+1) Our working tiers (US)
+We’re planning to bucket cases into:
+* Express / Mild (limited aligner treatment)
+* Moderate
+* Complex (comprehensive orthodontic treatment)
+We’ll also pass a simple flag for age group (adolescent vs adult) because CDT codes differ there.
+2) Starter Tier → CDT mapping (primary ortho code)
+Our Tier
+	Typical Ortho CDT Code (Adolescent)
+	Typical Ortho CDT Code (Adult)
+	Notes
+	Express / Mild (limited)
+	D8010 (Limited orthodontic treatment)
+	D8010 (Limited orthodontic treatment)
+	Use for minor alignment / short duration
+	Moderate (comprehensive)
+	D8080 (Comprehensive orthodontic treatment – adolescent dentition)
+	D8090 (Comprehensive orthodontic treatment – adult dentition)
+	Default “comprehensive” tier
+	Complex (comprehensive)
+	D8080
+	D8090
+	Same primary code as Moderate; complexity reflected in fee/notes, not necessarily a different CDT
+	Priority logic (simple):
+1. If Tier = Express/Mild → D8010
+2. If Tier = Moderate/Complex → choose D8080 vs D8090 based on age_group
+3) Common add-on / supporting documentation codes (optional)
+These are not always needed, but are commonly used for insurance documentation / claim support:
+Records / diagnostics (examples):
+* D0330 panoramic radiograph
+* D0210 intraoral complete series of radiographic images (FMX)
+* D0350 oral/facial photographic images
+* D0470 diagnostic casts (if applicable)
+Retention (if billed separately):
+* D8680 orthodontic retention (completion of active treatment)
+4) Explicit exclusions / notes for v1 architecture
+* Whitening: typically not covered / not part of ortho CDT claim logic (we’ll keep separate)
+* Monitoring/DM: generally not a CDT code; can be described in narrative if needed
+* This mapping is for claim-support / superbill generation and explanation text, not automatic billing.
+5) Data fields we’ll pass to support the rules
+* tier (Express/Mild/Moderate/Complex)
+* age_group (adolescent/adult)
+* Optional: diagnostic_assets flags (photos/xray/fmx/casts available)
+* Optional: retainers_included (true/false)
+If this structure works for you, you can model CDT logic as:
+* a primary ortho code selection rule (tier + age_group)
+* optional add-on codes toggled by diagnostic assets / retention
+We can tighten/expand the mapping once we move into the insurance module scope, but this should be enough for you to design the core schema and rule engine now.
