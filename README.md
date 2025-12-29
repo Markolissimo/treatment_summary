@@ -11,9 +11,6 @@ AI-powered service for generating professional orthodontic documentation includi
 | Version | Date | Module | Description |
 |---------|------|--------|-------------|
 | **0.2.0** | Dec 29, 2025 | Project | Added Insurance Summary module, security hardening, confirmation tracking |
-| **0.1.0** | Dec 29, 2025 | Insurance Summary | Initial release: deterministic CDT logic, conservative tone, admin-facing |
-| **0.2.0** | Dec 26, 2025 | Treatment Summary | Production hardening: JWT auth, CORS config, PHI redaction, CDT validation |
-| **0.1.0** | Dec 25, 2025 | Treatment Summary | Initial release: patient-facing summaries with AI generation |
 
 ---
 
@@ -71,6 +68,13 @@ See [Deployment Guide](docs/deployment/README.md) for detailed instructions.
 - Regeneration support with seed-based versioning
 - Audit logging and confirmation tracking
 
+| Version | Date | Module | Description |
+|---------|------|--------|-------------|
+| **0.2.0** | Dec 26, 2025 | Treatment Summary | Production hardening: JWT auth, CORS config, PHI redaction, CDT validation |
+| **0.1.0** | Dec 25, 2025 | Treatment Summary | Initial release: patient-facing summaries with AI generation |
+---
+
+
 ### Insurance Summary (v0.1.0)
 ✅ **Admin-facing insurance documentation**
 - Conservative, neutral tone (no diagnosis, no coverage promises)
@@ -78,6 +82,12 @@ See [Deployment Guide](docs/deployment/README.md) for detailed instructions.
 - Diagnostic asset tracking (D0350, D0330, D0210)
 - Required disclaimer for compliance
 - Regeneration support with version tracking
+
+| Version | Date | Module | Description |
+|---------|------|--------|-------------|
+| **0.1.0** | Dec 29, 2025 | Insurance Summary | Initial release: deterministic CDT logic, conservative tone, admin-facing |
+
+---
 
 ### Security & Compliance (v0.2.0)
 ✅ **Production-ready hardening**
@@ -87,6 +97,10 @@ See [Deployment Guide](docs/deployment/README.md) for detailed instructions.
 - Document confirmation tracking
 - Enhanced CDT rule validation
 - Schema versioning in audit logs
+
+| Version | Date | Module | Description |
+|---------|------|--------|-------------|
+| **0.2.0** | Dec 29, 2025 | Project | Added Insurance Summary module, security hardening, confirmation tracking |
 
 ---
 
