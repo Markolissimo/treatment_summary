@@ -34,7 +34,7 @@ class TestSettings:
         settings = get_settings()
         
         assert settings.app_name == "BiteSoft AI Document Generation System"
-        assert settings.app_version == "0.1.0"
+        assert settings.app_version == "0.2.0"
         assert settings.openai_model == "gpt-4o"
         assert settings.algorithm == "HS256"
         assert settings.access_token_expire_minutes == 30

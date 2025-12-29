@@ -2,6 +2,14 @@ from sqlmodel import SQLModel, Field, Relationship
 from datetime import datetime
 from typing import Optional, List
 import uuid
+from app.schemas.enums import CaseTier, AgeGroup
+
+# Document schema versions
+DOCUMENT_VERSIONS = {
+    "treatment_summary": "1.0",
+    "insurance_summary": "1.0",
+    "progress_notes": "1.0",
+}
 
 
 class AuditLog(SQLModel, table=True):
@@ -134,12 +142,14 @@ class CDTRule(SQLModel, table=True):
         description="Case tier (e.g., 'express', 'mild', 'moderate', 'complex')",
         max_length=50,
         index=True,
+        sa_column_kwargs={"nullable": False}
     )
     age_group: str = Field(
         ...,
         description="Age group ('adolescent' or 'adult')",
         max_length=20,
         index=True,
+        sa_column_kwargs={"nullable": False}
     )
     cdt_code: str = Field(
         ...,
@@ -167,4 +177,60 @@ class CDTRule(SQLModel, table=True):
     updated_at: datetime = Field(
         default_factory=datetime.utcnow,
         description="Timestamp when the rule was last updated",
+    )
+
+    def validate_tier(self) -> bool:
+        """Validate tier is in allowed values."""
+        return self.tier.lower() in [t.value for t in CaseTier]
+
+    def validate_age_group(self) -> bool:
+        """Validate age_group is in allowed values."""
+        return self.age_group.lower() in [a.value for a in AgeGroup]
+
+
+class DocumentConfirmation(SQLModel, table=True):
+    """Tracks dentist confirmation of generated documents before PDF generation."""
+
+    __tablename__ = "document_confirmations"
+
+    id: str = Field(
+        default_factory=lambda: str(uuid.uuid4()),
+        primary_key=True,
+        description="Unique identifier for the confirmation",
+    )
+    generation_id: str = Field(
+        ...,
+        index=True,
+        description="Reference to the AuditLog.id (generation event)",
+    )
+    user_id: str = Field(
+        ...,
+        index=True,
+        description="User who confirmed the document",
+    )
+    document_type: str = Field(
+        ...,
+        index=True,
+        description="Type of document confirmed (e.g., treatment_summary)",
+    )
+    document_version: str = Field(
+        ...,
+        description="Version of the document schema at confirmation time",
+    )
+    confirmed_at: datetime = Field(
+        default_factory=datetime.utcnow,
+        index=True,
+        description="Timestamp when the document was confirmed",
+    )
+    confirmed_payload: Optional[str] = Field(
+        default=None,
+        description="JSON string of the final edited document (if modified by dentist)",
+    )
+    pdf_generated_at: Optional[datetime] = Field(
+        default=None,
+        description="Timestamp when PDF was generated (if applicable)",
+    )
+    notes: Optional[str] = Field(
+        default=None,
+        description="Optional notes from the dentist at confirmation time",
     )

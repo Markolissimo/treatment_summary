@@ -160,9 +160,9 @@ CREATE TABLE audit_logs (
     created_at TIMESTAMP,
     status TEXT DEFAULT 'success',
     error_message TEXT,
-    seed INTEGER,                          -- NEW
-    is_regenerated BOOLEAN DEFAULT 0,      -- NEW
-    previous_version_uuid TEXT,            -- NEW
+    seed INTEGER,                          
+    is_regenerated BOOLEAN DEFAULT 0,      
+    previous_version_uuid TEXT,            
     INDEX ix_audit_logs_previous_version_uuid (previous_version_uuid)
 );
 ```

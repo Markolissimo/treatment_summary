@@ -1,6 +1,0 @@
-# Optional Demo Dependencies
-# Install only if you want to run the Streamlit demo
-# NOT required for production API
-
-streamlit>=1.29.0
-requests>=2.31.0

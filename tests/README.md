@@ -1,8 +1,10 @@
 # Test Suite Documentation
 
+**Version 0.2.0** | December 29, 2025
+
 ## Overview
 
-Comprehensive test suite for the BiteSoft AI Treatment Summary Generator, covering all system components.
+Comprehensive test suite for the BiteSoft AI Document Generation System, covering all system components including Treatment Summary (v0.2.0) and Insurance Summary (v0.1.0).
 
 ## Test Structure
 

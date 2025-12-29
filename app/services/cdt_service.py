@@ -1,6 +1,6 @@
 """CDT code selection and mapping service."""
 
-from typing import Optional, List
+from typing import Optional, List, Dict
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from app.db.models import CDTCode, CDTRule
@@ -36,7 +36,7 @@ async def select_cdt_codes(
     session: AsyncSession,
     tier: Optional[str] = None,
     patient_age: Optional[int] = None,
-    diagnostic_assets: Optional[dict] = None,
+    diagnostic_assets: Optional[Dict[str, bool]] = None,
     retainers_included: bool = False,
 ) -> CDTSelectionResult:
     """
@@ -50,7 +50,11 @@ async def select_cdt_codes(
         session: Database session
         tier: Case tier (express, mild, moderate, complex)
         patient_age: Patient age for adolescent/adult determination
-        diagnostic_assets: Optional dict with flags like {photos: True, xray: True, fmx: True, casts: True}
+        diagnostic_assets: Optional dict with granular flags:
+            - intraoral_photos: bool (maps to D0350)
+            - panoramic_xray: bool (maps to D0330)
+            - fmx: bool (maps to D0210)
+            - diagnostic_casts: bool (maps to D0470)
         retainers_included: Whether retainers are included in treatment
 
     Returns:
@@ -94,53 +98,28 @@ async def select_cdt_codes(
 
     primary_description = cdt_code.description if cdt_code else None
 
-    # Build suggested add-ons based on diagnostic assets and retainers
+
     suggested_add_ons = []
+    diagnostic_map = {
+        "intraoral_photos": "D0350",
+        "panoramic_xray": "D0330",
+        "fmx": "D0210",
+        "diagnostic_casts": "D0470"
+    }
 
     if diagnostic_assets:
-        # Query for diagnostic add-on codes
-        diagnostic_stmt = (
-            select(CDTCode)
-            .where(CDTCode.category == "diagnostic")
-            .where(CDTCode.is_active == True)
-            .where(CDTCode.is_primary == False)
-        )
-        diagnostic_result = await session.execute(diagnostic_stmt)
-        diagnostic_codes = diagnostic_result.scalars().all()
-
-        for code in diagnostic_codes:
-            # Map code to asset flag
-            if "panoramic" in code.description.lower() and diagnostic_assets.get("xray"):
-                suggested_add_ons.append(
-                    {"code": code.code, "description": code.description}
-                )
-            elif "intraoral" in code.description.lower() and diagnostic_assets.get("fmx"):
-                suggested_add_ons.append(
-                    {"code": code.code, "description": code.description}
-                )
-            elif "photographic" in code.description.lower() and diagnostic_assets.get("photos"):
-                suggested_add_ons.append(
-                    {"code": code.code, "description": code.description}
-                )
-            elif "casts" in code.description.lower() and diagnostic_assets.get("casts"):
-                suggested_add_ons.append(
-                    {"code": code.code, "description": code.description}
-                )
-
-    if retainers_included:
-        # Query for retention code
-        retention_stmt = (
-            select(CDTCode)
-            .where(CDTCode.category == "retention")
-            .where(CDTCode.is_active == True)
-        )
-        retention_result = await session.execute(retention_stmt)
-        retention_code = retention_result.scalars().first()
-
-        if retention_code:
-            suggested_add_ons.append(
-                {"code": retention_code.code, "description": retention_code.description}
-            )
+        for asset_key, cdt_code_str in diagnostic_map.items():
+            if diagnostic_assets.get(asset_key) is True:
+                # Fetch code description from DB
+                d_stmt = select(CDTCode).where(CDTCode.code == cdt_code_str)
+                d_result = await session.execute(d_stmt)
+                d_code = d_result.scalars().first()
+                
+                if d_code:
+                    suggested_add_ons.append({
+                        "code": d_code.code,
+                        "description": d_code.description
+                    })
 
     return CDTSelectionResult(
         primary_code=rule.cdt_code,

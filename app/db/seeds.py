@@ -1,22 +1,19 @@
-"""Seed script to populate CDT codes and rules based on client documentation."""
+"""Database seeding logic."""
 
-import asyncio
+import logging
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlmodel import select
 from app.db.database import async_engine as engine
 from app.db.models import CDTCode, CDTRule
-from sqlmodel import SQLModel, select
+
+logger = logging.getLogger(__name__)
 
 
 async def seed_cdt_data():
     """Populate CDT codes and rules from client documentation."""
+    logger.info("Starting CDT data seeding check...")
     
     async with AsyncSession(engine) as session:
-        # Create tables if they don't exist
-        async with engine.begin() as conn:
-            await conn.run_sync(SQLModel.metadata.create_all)
-        
-        print("Seeding CDT codes...")
-        
         # Primary orthodontic codes
         primary_codes = [
             {
@@ -43,7 +40,6 @@ async def seed_cdt_data():
         ]
         
         for code_data in primary_codes:
-            # Check if code already exists
             stmt = select(CDTCode).where(CDTCode.code == code_data["code"])
             result = await session.execute(stmt)
             existing = result.scalars().first()
@@ -51,9 +47,7 @@ async def seed_cdt_data():
             if not existing:
                 code = CDTCode(**code_data)
                 session.add(code)
-                print(f"  Added: {code_data['code']} - {code_data['description']}")
-            else:
-                print(f"  Skipped (exists): {code_data['code']}")
+                logger.info(f"Added CDT Code: {code_data['code']}")
         
         # Diagnostic/supporting codes
         diagnostic_codes = [
@@ -95,9 +89,7 @@ async def seed_cdt_data():
             if not existing:
                 code = CDTCode(**code_data)
                 session.add(code)
-                print(f"  Added: {code_data['code']} - {code_data['description']}")
-            else:
-                print(f"  Skipped (exists): {code_data['code']}")
+                logger.info(f"Added CDT Code: {code_data['code']}")
         
         # Retention code
         retention_codes = [
@@ -118,18 +110,11 @@ async def seed_cdt_data():
             if not existing:
                 code = CDTCode(**code_data)
                 session.add(code)
-                print(f"  Added: {code_data['code']} - {code_data['description']}")
-            else:
-                print(f"  Skipped (exists): {code_data['code']}")
+                logger.info(f"Added CDT Code: {code_data['code']}")
         
         await session.commit()
         
-        print("\nSeeding CDT rules...")
-        
-        # Rules based on client documentation:
-        # 1. If Tier = Express/Mild → D8010
-        # 2. If Tier = Moderate/Complex → choose D8080 vs D8090 based on age_group
-        
+        # Rules based on client documentation
         rules = [
             # Express tier
             {
@@ -194,7 +179,6 @@ async def seed_cdt_data():
         ]
         
         for rule_data in rules:
-            # Check if rule already exists
             stmt = (
                 select(CDTRule)
                 .where(CDTRule.tier == rule_data["tier"])
@@ -206,14 +190,7 @@ async def seed_cdt_data():
             if not existing:
                 rule = CDTRule(**rule_data)
                 session.add(rule)
-                print(f"  Added: {rule_data['tier']} + {rule_data['age_group']} → {rule_data['cdt_code']}")
-            else:
-                print(f"  Skipped (exists): {rule_data['tier']} + {rule_data['age_group']}")
+                logger.info(f"Added CDT Rule: {rule_data['tier']} + {rule_data['age_group']}")
         
         await session.commit()
-        
-        print("\n✅ CDT data seeding complete!")
-
-
-if __name__ == "__main__":
-    asyncio.run(seed_cdt_data())
+        logger.info("CDT data seeding check complete.")

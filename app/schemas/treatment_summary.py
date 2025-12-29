@@ -1,57 +1,15 @@
 from pydantic import BaseModel, Field
-from typing import Optional, Literal
-from enum import Enum
-
-
-class TreatmentType(str, Enum):
-    CLEAR_ALIGNERS = "clear aligners"
-    TRADITIONAL_BRACES = "traditional braces"
-    LINGUAL_BRACES = "lingual braces"
-    RETAINERS = "retainers"
-
-
-class AreaTreated(str, Enum):
-    UPPER = "upper"
-    LOWER = "lower"
-    BOTH = "both"
-
-
-class CaseDifficulty(str, Enum):
-    SIMPLE = "simple"
-    MODERATE = "moderate"
-    COMPLEX = "complex"
-
-
-class MonitoringApproach(str, Enum):
-    REMOTE = "remote"
-    MIXED = "mixed"
-    IN_CLINIC = "in-clinic"
-
-
-class Attachments(str, Enum):
-    NONE = "none"
-    SOME = "some"
-    EXTENSIVE = "extensive"
-
-
-class Audience(str, Enum):
-    PATIENT = "patient"
-    INTERNAL = "internal"
-
-
-class Tone(str, Enum):
-    CONCISE = "concise"
-    CASUAL = "casual"
-    REASSURING = "reassuring"
-    CLINICAL = "clinical"
-
-
-class CaseTier(str, Enum):
-    """Case tier for CDT code mapping."""
-    EXPRESS = "express"
-    MILD = "mild"
-    MODERATE = "moderate"
-    COMPLEX = "complex"
+from typing import Optional
+from app.schemas.enums import (
+    TreatmentType,
+    AreaTreated,
+    CaseDifficulty,
+    MonitoringApproach,
+    Attachments,
+    Audience,
+    Tone,
+    CaseTier,
+)
 
 
 class TreatmentSummaryRequest(BaseModel):

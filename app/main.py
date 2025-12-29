@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import get_settings
 from app.db.database import init_db, async_engine as engine
+from app.db.seeds import seed_cdt_data
 from app.api.routes import router as api_router
 from app.admin import setup_admin
 
@@ -15,6 +16,8 @@ async def lifespan(app: FastAPI):
     """Application lifespan handler for startup and shutdown events."""
     # Startup
     await init_db()
+    # Auto-seed database with CDT codes and rules
+    await seed_cdt_data()
     yield
     # Shutdown (cleanup if needed)
 
@@ -55,7 +58,7 @@ All generated documents adhere to strict clinical communication guidelines:
 # CORS middleware for frontend integration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Configure appropriately for production
+    allow_origins=settings.cors_origins_list,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

@@ -7,7 +7,8 @@ sqlmodel>=0.0.14
 sqlalchemy>=2.0.25
 python-jose[cryptography]>=3.3.0
 python-multipart>=0.0.6
-aiosqlite>=0.19.0
+asyncpg>=0.29.0
+aiosqlite>=0.19.0 # For DEMO database
 streamlit
 sqladmin>=0.16.0
 # Testing dependencies

@@ -1,0 +1,147 @@
+Insurance Summary Generator — Product &
+Logic Specification (v1)
+1. Purpose & Philosophy
+The Insurance Summary is an administrative support tool for dentists and practice staff. It generates
+a clear, conservative summary to assist with insurance documentation.
+It is NOT: - a diagnosis - a guarantee of coverage or reimbursement - a claim submission - a statement
+of medical necessity
+Primary goals: - reduce admin time - standardise insurance-facing language - minimise denials caused
+by wording issues - remain legally conservative and dentist-controlled
+
+2. Intended Users
+• Dentist
+• Treatment coordinator / admin
+• Insurance reviewer (reader of the document)
+Tone must be: - factual - neutral - non-promissory
+
+3. Inputs to the AI (v1)
+Inputs are simple, explicit, and provided by the portal. No inference.
+
+{
+"tier": "express_mild | moderate | complex",
+"arches": "upper | lower | both",
+"age_group": "adolescent | adult",
+"retainers_included": true,
+"diagnostic_assets": {
+"intraoral_photos": true,
+"panoramic_xray": true,
+"fmx": false
+},
+"monitoring_approach": "remote | hybrid | in_clinic",
+"notes": "optional dentist/admin note"
+}
+Explicit exclusions (v1): - CBCT (no inputs, no CDT logic) - Pricing - Insurance approval prediction
+
+1
+
+4. CDT Logic Rules (v1)
+Primary Orthodontic Code
+• Express / Mild: D8010
+• Moderate / Complex:
+• Adolescent → D8080
+• Adult → D8090
+
+Retainers
+• If retainers_included = true → bundled
+• Do NOT include D8680 unless explicitly billed separately (out of scope v1)
+
+Diagnostics (only if explicitly flagged)
+• Intraoral photos → D0350
+• Panoramic X-ray → D0330
+• FMX → D0210
+No guessing. If not flagged → not included.
+
+5. Output Structure
+The AI returns editable text only. No automation.
+
+{
+"insurance_summary": "...",
+"cdt_codes": ["D8080", "D0350", "D0330"]
+}
+
+6. Output Content Rules
+The summary MUST:
+• describe treatment in neutral terms
+• explain why orthodontic treatment is being proposed
+• list CDT codes as supporting references only
+• state that coverage depends on the payer
+
+The summary MUST NOT:
+• promise coverage
+• state medical necessity
+• include diagnosis language
+• include pricing
+
+2
+
+7. Required Disclaimer (always included)
+This document is provided for administrative support only. Coverage and reimbursement
+are determined solely by the patient’s insurance provider. Submission of this information
+does not guarantee payment or approval.
+
+8. Regeneration & Audit
+• Dentist can regenerate the summary
+• Each regeneration produces a new version
+• Final version must be dentist-approved before use
+• All versions are logged for audit
+
+9. Why This Works for Dentists
+• Saves 10–20 minutes per case
+• Reduces insurance wording errors
+• Avoids overreach and claim risk
+• Produces PMS-ready documentation
+
+10. Future Extensions (Out of Scope v1)
+• Separate retainer billing
+• CBCT handling
+• PMS auto-push
+• Insurance pre-check logic
+
+v1 success metric: Dentists trust it enough to use it daily without fear of insurance issues.
+
+3
+
+
+These are intentionally conservative, admin-facing, and designed for PMS / insurance documentation use.
+
+It’s generated as a draft, reviewed by the dentist, saved in the case, and then used by the practice as supporting documentation in their existing PMS or insurance workflow
+
+Example 1 — Moderate Case (Adult)
+Insurance Summary (Draft – Admin Use Only)
+The patient has been assessed for orthodontic treatment using clear aligner therapy to address dental alignment concerns. The proposed treatment involves both upper and lower arches and is expected to span a moderate duration.
+Standard diagnostic records have been obtained to support treatment planning, including clinical photographs and radiographic imaging. These records are used to document current dental alignment and to assist with treatment planning and monitoring.
+The treatment is planned and supervised by a licensed dental professional. Retention is included as part of the overall treatment plan unless otherwise specified. This summary is provided for administrative and insurance documentation purposes only. Final coverage determinations are subject to individual payer policies.
+Referenced CDT codes (for administrative reference):
+D8090 – Comprehensive orthodontic treatment (adult)
+D0350 – Oral/facial photographic images
+D0330 – Panoramic radiographic image
+
+Example 2 — Express / Mild Case (Adolescent)
+Insurance Summary (Draft – Admin Use Only)
+The patient is planned for limited orthodontic treatment using clear aligners to address minor dental alignment concerns. Treatment is limited in scope and duration and focuses on targeted tooth movement.
+Diagnostic records, including clinical photographs, have been collected to support treatment planning. These records are intended to document baseline alignment and support administrative review.
+Treatment planning and monitoring are overseen by the treating dentist. This document is intended to assist with insurance-related administration and does not represent a guarantee of coverage or benefit eligibility.
+Referenced CDT codes (for administrative reference):
+D8010 – Limited orthodontic treatment
+D0350 – Oral/facial photographic images
+
+Example 3 — Complex Case (Adolescent)
+Insurance Summary (Draft – Admin Use Only)
+The patient has been evaluated for comprehensive orthodontic treatment involving clear aligner therapy across both arches. The proposed treatment addresses more complex alignment considerations and is expected to require an extended treatment duration.
+Comprehensive diagnostic records have been obtained to support treatment planning and monitoring, including clinical photographs and radiographic imaging where applicable.
+Treatment is managed by a licensed dental professional, with periodic monitoring throughout the course of care. Retention is included as part of the comprehensive treatment plan unless billed separately by the practice. This summary is provided solely for insurance documentation support and does not imply coverage approval.
+Referenced CDT codes (for administrative reference):
+D8080 – Comprehensive orthodontic treatment (adolescent)
+D0350 – Oral/facial photographic images
+D0330 – Panoramic radiographic image
+
+Notes for prompt tuning
+Tone: neutral, factual, non-promissory
+No diagnosis language
+No coverage guarantees
+No pricing or benefit estimation
+CDT codes shown as reference only
+If helpful, we can also do:
+“short-form” vs “long-form” variants, or
+insurer-neutral vs insurer-specific tone profiles later.
+Let me know if these examples work as a baseline and feel free to iterate on structure as needed.

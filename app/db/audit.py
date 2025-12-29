@@ -2,7 +2,8 @@ import json
 from datetime import datetime
 from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.db.models import AuditLog
+from app.db.models import AuditLog, DOCUMENT_VERSIONS
+from app.core.phi_utils import prepare_audit_data
 
 
 async def log_generation(
@@ -23,6 +24,9 @@ async def log_generation(
     """
     Log a document generation event to the audit database.
     
+    Automatically applies PHI redaction if configured and uses proper
+    document versioning from DOCUMENT_VERSIONS.
+    
     Args:
         session: Database session
         user_id: ID of the user who initiated the generation
@@ -41,11 +45,19 @@ async def log_generation(
     Returns:
         The created AuditLog entry
     """
+    # Get proper document version
+    document_version = DOCUMENT_VERSIONS.get(document_type, "1.0")
+    
+    # Apply PHI redaction if configured
+    input_data_str = prepare_audit_data(input_data)
+    generated_text_str = prepare_audit_data(generated_text)
+    
     audit_entry = AuditLog(
         user_id=user_id,
         document_type=document_type,
-        input_data=json.dumps(input_data),
-        generated_text=json.dumps(generated_text),
+        document_version=document_version,
+        input_data=input_data_str,
+        generated_text=generated_text_str,
         model_used=model_used,
         tokens_used=tokens_used,
         generation_time_ms=generation_time_ms,
