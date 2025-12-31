@@ -184,10 +184,7 @@ Clean, predictable contract:
   "success": true,
   "document": {
     "title": "Your Clear Aligner Treatment Plan",
-    "summary": "...",
-    "key_points": ["...", "..."],
-    "next_steps": ["...", "..."],
-    "care_instructions": ["...", "..."]
+    "summary": "..."
   },
   "metadata": {
     "tokens_used": 450,
@@ -249,7 +246,7 @@ await log_generation(
     user_id=user_id,
     document_type="treatment_summary",
     input_data=request.model_dump(),
-    generated_text=result.output.model_dump(),
+    output_data=result.output.model_dump(),
     tokens_used=result.tokens_used,
     generation_time_ms=result.generation_time_ms,
     status="success",
@@ -298,9 +295,6 @@ This allows GPT-4 to:
 class TreatmentSummaryOutput(BaseModel):
     title: str                          # Brief, engaging title
     summary: str                        # Main narrative (200-400 words)
-    key_points: list[str]              # 3-7 bullet points
-    next_steps: list[str]              # 2-5 action items
-    care_instructions: Optional[list[str]]  # Patient-facing only
 ```
 
 ### Design Rationale
@@ -309,9 +303,6 @@ class TreatmentSummaryOutput(BaseModel):
 |-------|---------|------------|
 | `title` | Email subject line | Email header |
 | `summary` | Main body text | Email body |
-| `key_points` | Quick reference | Highlighted section |
-| `next_steps` | Action items | Call-to-action area |
-| `care_instructions` | Patient guidance | Expandable section |
 
 **Portal Integration:**
 Portal team can:

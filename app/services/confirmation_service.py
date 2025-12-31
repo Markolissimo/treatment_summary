@@ -1,6 +1,8 @@
 """Service for handling document confirmations."""
 
 import json
+import difflib
+import logging
 from datetime import datetime
 from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -9,6 +11,44 @@ from fastapi import HTTPException, status
 
 from app.db.models import DocumentConfirmation, AuditLog, DOCUMENT_VERSIONS
 from app.core.phi_utils import prepare_audit_data
+
+logger = logging.getLogger(__name__)
+
+
+def _extract_summary_text(document_type: str, payload: dict) -> Optional[str]:
+    """Extract the summary text from payload based on document type."""
+    if not isinstance(payload, dict):
+        return None
+    
+    if document_type == "insurance_summary":
+        value = payload.get("insurance_summary")
+        return value if isinstance(value, str) else None
+    elif document_type == "treatment_summary":
+        value = payload.get("treatment_summary")
+        return value if isinstance(value, str) else None
+    
+    # Fallback for legacy or unknown types
+    value = payload.get("summary")
+    return value if isinstance(value, str) else None
+
+
+def _similarity(a: Optional[str], b: Optional[str]) -> Optional[float]:
+    """Calculate similarity ratio between two strings using SequenceMatcher.
+    
+    Args:
+        a: First string to compare
+        b: Second string to compare
+        
+    Returns:
+        Similarity score between 0.0 and 1.0, or None if either string is empty
+    """
+    if not a or not b:
+        return None
+    a_norm = a.strip()
+    b_norm = b.strip()
+    if not a_norm or not b_norm:
+        return None
+    return float(difflib.SequenceMatcher(a=a_norm, b=b_norm).ratio())
 
 
 async def confirm_document(
@@ -60,6 +100,69 @@ async def confirm_document(
     
     # Get document version
     document_version = DOCUMENT_VERSIONS.get(audit_log.document_type, "1.0")
+
+    # Parse original generated payload from audit log
+    original_payload: dict = {}
+    try:
+        parsed = json.loads(audit_log.output_data) if audit_log.output_data else {}
+        if isinstance(parsed, dict):
+            original_payload = parsed
+    except Exception:
+        original_payload = {}
+
+    original_summary = _extract_summary_text(audit_log.document_type, original_payload)
+
+    approved_payload = confirmed_payload if confirmed_payload else original_payload
+    approved_summary = _extract_summary_text(audit_log.document_type, approved_payload)
+
+    is_edited = False
+    if original_summary is not None and approved_summary is not None:
+        is_edited = approved_summary != original_summary
+    elif confirmed_payload is not None:
+        # If dentist sent an explicit payload but we can't extract summaries, treat as edited
+        is_edited = True
+
+    similarity_score = _similarity(original_summary, approved_summary)
+
+    # Store before/after summary text
+    edited_summary_str = None
+    if is_edited and original_summary is not None and approved_summary is not None:
+        edited_summary_str = prepare_audit_data({
+            "before": original_summary,
+            "after": approved_summary
+        })
+
+    # Regeneration history: trace back through previous_version_uuid chain
+    # Only build chain if this generation has a previous_version_uuid (i.e., it's a regeneration)
+    regen_history_ids: list[str] = []
+    try:
+        # Only trace back if this generation is actually a regeneration
+        if audit_log.previous_version_uuid:
+            # Walk backwards through the chain via previous_version_uuid
+            chain: list[str] = [generation_id]
+            current_uuid = audit_log.previous_version_uuid
+            
+            while current_uuid:
+                # Fetch the previous audit log
+                prev_stmt = select(AuditLog.id, AuditLog.previous_version_uuid).where(AuditLog.id == current_uuid)
+                prev_result = await session.execute(prev_stmt)
+                prev_row = prev_result.first()
+                
+                if prev_row and prev_row[0]:
+                    chain.append(prev_row[0])
+                    current_uuid = prev_row[1]  # Continue to the next previous
+                else:
+                    break
+            
+            # Reverse to get chronological order (oldest first)
+            chain.reverse()
+            regen_history_ids = chain
+            logger.info(f"Regeneration history: found chain of {len(regen_history_ids)} generations")
+        else:
+            logger.info(f"No previous_version_uuid found, this is not a regeneration - history will be empty")
+    except Exception as e:
+        logger.error(f"Error fetching regeneration history: {e}")
+        regen_history_ids = []
     
     # Prepare confirmed payload (apply PHI redaction if configured)
     confirmed_payload_str = None
@@ -74,6 +177,10 @@ async def confirm_document(
         document_version=document_version,
         confirmed_at=datetime.utcnow(),
         confirmed_payload=confirmed_payload_str,
+        is_edited=is_edited,
+        edited_summary=edited_summary_str,
+        similarity_score=similarity_score,
+        regeneration_history=json.dumps(regen_history_ids),
         notes=notes,
     )
     

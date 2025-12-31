@@ -227,15 +227,7 @@ curl -X POST "http://YOUR_SERVER_IP:8000/api/v1/generate-treatment-summary" \
   "success": true,
   "document": {
     "title": "Your Clear Aligner Treatment Plan",
-    "summary": "Based on your assessment, this is a moderate alignment case...",
-    "key_points": [
-      "Treatment uses clear aligners for both upper and lower teeth",
-      "Expected duration is 6-9 months"
-    ],
-    "next_steps": [
-      "Schedule your initial appointment",
-      "Review care instructions"
-    ]
+    "summary": "Based on your assessment, this is a moderate alignment case..."
   },
   "cdt_codes": {
     "primary_code": "D8090",

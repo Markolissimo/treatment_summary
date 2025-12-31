@@ -25,7 +25,7 @@ class AuditLogAdmin(ModelView, model=AuditLog):
     ]
 
     # Columns searchable
-    column_searchable_list = [AuditLog.user_id, AuditLog.document_type]
+    column_searchable_list = [AuditLog.id, AuditLog.user_id, AuditLog.document_type]
 
     # Columns sortable
     column_sortable_list = [
@@ -50,6 +50,13 @@ class CDTCodeAdmin(ModelView, model=CDTCode):
     name = "CDT Code"
     name_plural = "CDT Codes"
     icon = "fa-solid fa-code"
+
+    # Ensure the string PK (code) is shown on the create form
+    # (SQLAdmin often hides PK fields by default)
+    form_include_pk = True
+
+    # Be explicit about create support for this view
+    can_create = True
 
     # Columns to display in list view
     column_list = [
@@ -155,6 +162,7 @@ class DocumentConfirmationAdmin(ModelView, model=DocumentConfirmation):
 
     # Columns searchable
     column_searchable_list = [
+        DocumentConfirmation.id,
         DocumentConfirmation.generation_id,
         DocumentConfirmation.user_id,
         DocumentConfirmation.document_type,

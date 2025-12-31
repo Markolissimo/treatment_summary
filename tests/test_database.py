@@ -21,7 +21,7 @@ class TestAuditLog:
             document_type="treatment_summary",
             document_version="1.0",
             input_data='{"treatment_type": "clear aligners"}',
-            generated_text='{"title": "Test Summary"}',
+            output_data='{"title": "Test Summary"}',
             model_used="gpt-4o",
             tokens_used=450,
             generation_time_ms=1250,
@@ -47,7 +47,7 @@ class TestAuditLog:
             document_type="treatment_summary",
             document_version="1.0",
             input_data='{"treatment_type": "clear aligners"}',
-            generated_text="{}",
+            output_data="{}",
             model_used="gpt-4o",
             status="error",
             error_message="OpenAI API timeout",
@@ -71,7 +71,7 @@ class TestAuditLog:
                 document_type="treatment_summary",
                 document_version="1.0",
                 input_data="{}",
-                generated_text="{}",
+                output_data="{}",
                 model_used="gpt-4o",
                 status="success",
             )
@@ -96,7 +96,7 @@ class TestAuditLog:
             document_type="treatment_summary",
             document_version="1.0",
             input_data="{}",
-            generated_text="{}",
+            output_data="{}",
             model_used="gpt-4o",
             status="success",
         )
@@ -106,7 +106,7 @@ class TestAuditLog:
             document_type="insurance_summary",
             document_version="1.0",
             input_data="{}",
-            generated_text="{}",
+            output_data="{}",
             model_used="gpt-4o",
             status="success",
         )
@@ -136,7 +136,7 @@ class TestLogGeneration:
             user_id="test_user_005",
             document_type="treatment_summary",
             input_data={"treatment_type": "clear aligners"},
-            generated_text={"title": "Test Summary", "summary": "Test content"},
+            output_data={"title": "Test Summary", "summary": "Test content"},
             model_used="gpt-4o",
             tokens_used=500,
             generation_time_ms=1500,
@@ -158,7 +158,7 @@ class TestLogGeneration:
             user_id="test_user_006",
             document_type="treatment_summary",
             input_data={"treatment_type": "clear aligners"},
-            generated_text={},
+            output_data={},
             model_used="gpt-4o",
             status="error",
             error_message="API rate limit exceeded",
@@ -177,7 +177,7 @@ class TestLogGeneration:
             user_id="test_user_007",
             document_type="treatment_summary",
             input_data={},
-            generated_text={},
+            output_data={},
         )
         
         assert audit_entry.model_used == "gpt-4o"
@@ -192,7 +192,7 @@ class TestLogGeneration:
             user_id="test_user_008",
             document_type="treatment_summary",
             input_data={"test": "data"},
-            generated_text={"test": "output"},
+            output_data={"test": "output"},
         )
         
         # Query to verify persistence
@@ -203,4 +203,4 @@ class TestLogGeneration:
         assert log is not None
         assert log.user_id == "test_user_008"
         assert '"test": "data"' in log.input_data
-        assert '"test": "output"' in log.generated_text
+        assert '"test": "output"' in log.output_data

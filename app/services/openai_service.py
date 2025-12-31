@@ -135,12 +135,6 @@ async def generate_treatment_summary(
     if parsed_output:
         parsed_output.title = normalize_to_ascii(parsed_output.title)
         parsed_output.summary = normalize_to_ascii(parsed_output.summary)
-        parsed_output.key_points = [normalize_to_ascii(point) for point in parsed_output.key_points]
-        parsed_output.next_steps = [normalize_to_ascii(step) for step in parsed_output.next_steps]
-        if parsed_output.care_instructions:
-            parsed_output.care_instructions = [
-                normalize_to_ascii(instr) for instr in parsed_output.care_instructions
-            ]
 
     tokens_used = response.usage.total_tokens if response.usage else 0
 

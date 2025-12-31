@@ -143,6 +143,7 @@ with tab1:
                 key="ts_tone"
             )
         
+        # Track inputs for regeneration
         current_inputs = {
             "tier": tier,
             "treatment_type": treatment_type,
@@ -160,17 +161,32 @@ with tab1:
             "dentist_note": dentist_note,
         }
         
+        # Convert dict to hashable string for set storage
+        current_inputs_key = json.dumps(current_inputs, sort_keys=True)
+        
         if "last_inputs" not in st.session_state:
             st.session_state["last_inputs"] = None
+
+        if "ts_last_confirmed_inputs" not in st.session_state:
+            st.session_state["ts_last_confirmed_inputs"] = None
         
-        inputs_changed = st.session_state["last_inputs"] != current_inputs
+        inputs_changed = st.session_state["last_inputs"] != current_inputs_key
         
-        if "last_result" in st.session_state and not inputs_changed:
+        # Maintain regeneration state: if inputs haven't changed and we've not just confirmed this input set
+        if (
+            "last_result" in st.session_state
+            and not inputs_changed
+            and st.session_state.get("ts_last_confirmed_inputs") != current_inputs_key
+        ):
             button_label = "🔄 Regenerate Treatment Summary"
             is_regeneration = True
         else:
             button_label = "🚀 Generate Treatment Summary"
             is_regeneration = False
+            if inputs_changed:
+                # Clear confirmation history when inputs change
+                if "ts_confirmations" in st.session_state:
+                    del st.session_state["ts_confirmations"]
         
         generate_button = st.button(button_label, type="primary", use_container_width=True, key="ts_generate")
     
@@ -219,7 +235,20 @@ with tab1:
                         
                         st.session_state["last_result"] = result
                         st.session_state["last_payload"] = payload
-                        st.session_state["last_inputs"] = current_inputs
+                        st.session_state["last_inputs"] = current_inputs_key
+
+                        if not is_regeneration:
+                            if "ts_confirmations" in st.session_state:
+                                del st.session_state["ts_confirmations"]
+                            if "ts_last_confirmation" in st.session_state:
+                                del st.session_state["ts_last_confirmation"]
+                            st.session_state["ts_last_confirmed_inputs"] = None
+                        
+                        # Track input history for regeneration detection
+                        if "ts_input_history" not in st.session_state:
+                            st.session_state["ts_input_history"] = set()
+                        st.session_state["ts_input_history"].add(current_inputs_key)
+                        
                         if "generation_count" not in st.session_state:
                             st.session_state["generation_count"] = 0
                         st.session_state["generation_count"] += 1
@@ -260,6 +289,105 @@ with tab1:
             
             if is_edited:
                 st.info("✏️ Summary has been edited")
+
+            confirm_notes = st.text_area(
+                "Approval Notes (optional)",
+                placeholder="Optional approval notes...",
+                max_chars=1000,
+                key=f"ts_confirm_notes_{generation_key}",
+            )
+
+            generation_id = result.get("uuid")
+            approve_disabled = not generation_id
+            approve_button = st.button(
+                "✅ Approve (Log Confirmation)",
+                type="secondary",
+                use_container_width=True,
+                disabled=approve_disabled,
+                key=f"ts_approve_{generation_key}",
+            )
+
+            if approve_button:
+                st.session_state["ts_pending_approve"] = True
+                st.session_state["ts_pending_generation_id"] = generation_id
+                st.session_state["ts_pending_confirm_notes"] = confirm_notes
+                # Match output_data structure: {"treatment_summary": "text"}
+                st.session_state["ts_pending_confirmed_payload"] = {
+                    "treatment_summary": edited_summary
+                }
+                st.rerun()
+
+            if st.session_state.get("ts_pending_approve") and st.session_state.get("ts_pending_generation_id") == generation_id:
+                st.warning("Are you sure you want to approve/confirm this document?", icon="⚠️")
+                confirm_col, cancel_col = st.columns([1, 1])
+                with confirm_col:
+                    confirm_now = st.button(
+                        "Yes, confirm",
+                        type="primary",
+                        use_container_width=True,
+                        key=f"ts_confirm_yes_{generation_key}",
+                    )
+                with cancel_col:
+                    cancel_now = st.button(
+                        "Cancel",
+                        type="secondary",
+                        use_container_width=True,
+                        key=f"ts_confirm_cancel_{generation_key}",
+                    )
+
+                if cancel_now:
+                    st.session_state["ts_pending_approve"] = False
+                    st.session_state["ts_pending_generation_id"] = None
+                    st.session_state["ts_pending_confirm_notes"] = None
+                    st.session_state["ts_pending_confirmed_payload"] = None
+                    st.rerun()
+
+                if confirm_now:
+                    try:
+                        confirm_response = requests.post(
+                            f"{API_BASE_URL}/api/v1/documents/{generation_id}/confirm",
+                            json={
+                                "confirmed_payload": st.session_state.get("ts_pending_confirmed_payload"),
+                                "notes": st.session_state.get("ts_pending_confirm_notes") or None,
+                            },
+                            timeout=30,
+                        )
+
+                        if confirm_response.status_code == 200:
+                            confirmation_data = confirm_response.json()
+
+                            if "ts_confirmations" not in st.session_state:
+                                st.session_state["ts_confirmations"] = []
+                            st.session_state["ts_confirmations"].append(confirmation_data)
+                            st.session_state["ts_last_confirmation"] = confirmation_data
+                            st.session_state["ts_last_confirmed_inputs"] = current_inputs_key
+
+                            st.session_state["ts_pending_approve"] = False
+                            st.session_state["ts_pending_generation_id"] = None
+                            st.session_state["ts_pending_confirm_notes"] = None
+                            st.session_state["ts_pending_confirmed_payload"] = None
+
+                            st.toast("✅ Document approved and logged")
+                            st.rerun()
+                        else:
+                            st.error(f"❌ Approval failed: {confirm_response.status_code}")
+                            try:
+                                st.json(confirm_response.json())
+                            except Exception:
+                                st.write(confirm_response.text)
+                    except requests.exceptions.ConnectionError:
+                        st.error("❌ Cannot connect to API. Make sure the FastAPI server is running on http://localhost:8000")
+                    except Exception as e:
+                        st.error(f"❌ Error: {str(e)}")
+
+            # Show all confirmations for this input set
+            if "ts_confirmations" in st.session_state and st.session_state["ts_confirmations"]:
+                with st.expander(f"✅ Approval / Confirmation History ({len(st.session_state['ts_confirmations'])} approvals)"):
+                    for idx, conf in enumerate(reversed(st.session_state["ts_confirmations"]), 1):
+                        st.markdown(f"**Approval #{len(st.session_state['ts_confirmations']) - idx + 1}** (Generation: `{conf.get('generation_id', 'N/A')[:8]}...`)")
+                        st.json(conf)
+                        if idx < len(st.session_state["ts_confirmations"]):
+                            st.markdown("---")
             
             # Display CDT codes if available
             if result.get("cdt_codes"):
@@ -362,9 +490,9 @@ with tab2:
         
         with st.expander("Diagnostic Assets", expanded=True):
             st.caption("Only flagged assets will generate CDT codes")
-            ins_photos = st.checkbox("Intraoral Photos (D0350)", value=True, key="ins_photos")
-            ins_pano = st.checkbox("Panoramic X-ray (D0330)", value=True, key="ins_pano")
-            ins_fmx = st.checkbox("FMX - Full Mouth X-rays (D0210)", value=False, key="ins_fmx")
+            ins_photos = st.checkbox("Intraoral Photos", value=True, key="ins_photos")
+            ins_pano = st.checkbox("Panoramic X-ray", value=True, key="ins_pano")
+            ins_fmx = st.checkbox("FMX - Full Mouth X-rays", value=False, key="ins_fmx")
         
         with st.expander("Additional Notes", expanded=False):
             ins_notes = st.text_area(
@@ -387,17 +515,32 @@ with tab2:
             "notes": ins_notes,
         }
         
+        # Convert dict to hashable string for set storage
+        ins_current_inputs_key = json.dumps(ins_current_inputs, sort_keys=True)
+        
         if "ins_last_inputs" not in st.session_state:
             st.session_state["ins_last_inputs"] = None
+
+        if "ins_last_confirmed_inputs" not in st.session_state:
+            st.session_state["ins_last_confirmed_inputs"] = None
         
-        ins_inputs_changed = st.session_state["ins_last_inputs"] != ins_current_inputs
+        ins_inputs_changed = st.session_state["ins_last_inputs"] != ins_current_inputs_key
         
-        if "ins_last_result" in st.session_state and not ins_inputs_changed:
+        # Maintain regeneration state: if inputs haven't changed and we've not just confirmed this input set
+        if (
+            "ins_last_result" in st.session_state
+            and not ins_inputs_changed
+            and st.session_state.get("ins_last_confirmed_inputs") != ins_current_inputs_key
+        ):
             ins_button_label = "🔄 Regenerate Insurance Summary"
             ins_is_regeneration = True
         else:
             ins_button_label = "🚀 Generate Insurance Summary"
             ins_is_regeneration = False
+            if ins_inputs_changed:
+                # Clear confirmation history when inputs change
+                if "ins_confirmations" in st.session_state:
+                    del st.session_state["ins_confirmations"]
         
         ins_generate_button = st.button(ins_button_label, type="primary", use_container_width=True, key="ins_generate")
     
@@ -429,18 +572,31 @@ with tab2:
                     payload["previous_version_uuid"] = st.session_state["ins_last_result"].get("uuid")
                 
                 try:
-                    response = requests.post(
+                    ins_response = requests.post(
                         f"{API_BASE_URL}/api/v1/generate-insurance-summary",
                         json=payload,
                         timeout=30
                     )
                     
-                    if response.status_code == 200:
-                        result = response.json()
+                    if ins_response.status_code == 200:
+                        ins_result = ins_response.json()
                         
-                        st.session_state["ins_last_result"] = result
+                        st.session_state["ins_last_result"] = ins_result
                         st.session_state["ins_last_payload"] = payload
-                        st.session_state["ins_last_inputs"] = ins_current_inputs
+                        st.session_state["ins_last_inputs"] = ins_current_inputs_key
+
+                        if not ins_is_regeneration:
+                            if "ins_confirmations" in st.session_state:
+                                del st.session_state["ins_confirmations"]
+                            if "ins_last_confirmation" in st.session_state:
+                                del st.session_state["ins_last_confirmation"]
+                            st.session_state["ins_last_confirmed_inputs"] = None
+                        
+                        # Track input history for regeneration detection
+                        if "ins_input_history" not in st.session_state:
+                            st.session_state["ins_input_history"] = set()
+                        st.session_state["ins_input_history"].add(ins_current_inputs_key)
+                        
                         if "ins_generation_count" not in st.session_state:
                             st.session_state["ins_generation_count"] = 0
                         st.session_state["ins_generation_count"] += 1
@@ -453,8 +609,8 @@ with tab2:
                         st.rerun()
                         
                     else:
-                        st.error(f"❌ Error: {response.status_code}")
-                        st.json(response.json())
+                        st.error(f"❌ Error: {ins_response.status_code}")
+                        st.json(ins_response.json())
                         
                 except requests.exceptions.ConnectionError:
                     st.error("❌ Cannot connect to API. Make sure the FastAPI server is running.")
@@ -485,14 +641,130 @@ with tab2:
             
             if is_edited:
                 st.info("✏️ Summary has been edited")
+
+            ins_confirm_notes = st.text_area(
+                "Approval Notes (optional)",
+                placeholder="Optional approval notes...",
+                max_chars=1000,
+                key=f"ins_confirm_notes_{ins_gen_key}",
+            )
+
+            ins_generation_id = result.get("uuid")
+            ins_approve_disabled = not ins_generation_id
+            ins_approve_button = st.button(
+                "✅ Approve (Log Confirmation)",
+                type="secondary",
+                use_container_width=True,
+                disabled=ins_approve_disabled,
+                key=f"ins_approve_{ins_gen_key}",
+            )
+
+            if ins_approve_button:
+                st.session_state["ins_pending_approve"] = True
+                st.session_state["ins_pending_generation_id"] = ins_generation_id
+                st.session_state["ins_pending_confirm_notes"] = ins_confirm_notes
+                confirmed_payload = {
+                    "insurance_summary": edited_summary,
+                    "cdt_codes": cdt_codes  # List of code strings from the generation response
+                }
+                st.session_state["ins_pending_confirmed_payload"] = confirmed_payload
+                st.rerun()
+
+            if st.session_state.get("ins_pending_approve") and st.session_state.get("ins_pending_generation_id") == ins_generation_id:
+                st.warning("Are you sure you want to approve/confirm this document?", icon="⚠️")
+                ins_confirm_col, ins_cancel_col = st.columns([1, 1])
+                with ins_confirm_col:
+                    ins_confirm_now = st.button(
+                        "Yes, confirm",
+                        type="primary",
+                        use_container_width=True,
+                        key=f"ins_confirm_yes_{ins_gen_key}",
+                    )
+                with ins_cancel_col:
+                    ins_cancel_now = st.button(
+                        "Cancel",
+                        type="secondary",
+                        use_container_width=True,
+                        key=f"ins_confirm_cancel_{ins_gen_key}",
+                    )
+
+                if ins_cancel_now:
+                    st.session_state["ins_pending_approve"] = False
+                    st.session_state["ins_pending_generation_id"] = None
+                    st.session_state["ins_pending_confirm_notes"] = None
+                    st.session_state["ins_pending_confirmed_payload"] = None
+                    st.rerun()
+
+                if ins_confirm_now:
+                    try:
+                        confirm_response = requests.post(
+                            f"{API_BASE_URL}/api/v1/documents/{ins_generation_id}/confirm",
+                            json={
+                                "confirmed_payload": st.session_state.get("ins_pending_confirmed_payload"),
+                                "notes": st.session_state.get("ins_pending_confirm_notes") or None,
+                            },
+                            timeout=30,
+                        )
+
+                        if confirm_response.status_code == 200:
+                            confirmation_data = confirm_response.json()
+
+                            if "ins_confirmations" not in st.session_state:
+                                st.session_state["ins_confirmations"] = []
+                            st.session_state["ins_confirmations"].append(confirmation_data)
+                            st.session_state["ins_last_confirmation"] = confirmation_data
+                            st.session_state["ins_last_confirmed_inputs"] = ins_current_inputs_key
+
+                            st.session_state["ins_pending_approve"] = False
+                            st.session_state["ins_pending_generation_id"] = None
+                            st.session_state["ins_pending_confirm_notes"] = None
+                            st.session_state["ins_pending_confirmed_payload"] = None
+
+                            st.toast("✅ Document approved and logged")
+                            st.rerun()
+                        else:
+                            st.error(f"❌ Approval failed: {confirm_response.status_code}")
+                            try:
+                                st.json(confirm_response.json())
+                            except Exception:
+                                st.write(confirm_response.text)
+                    except requests.exceptions.ConnectionError:
+                        st.error("❌ Cannot connect to API. Make sure the FastAPI server is running.")
+                    except Exception as e:
+                        st.error(f"❌ Error: {str(e)}")
+
+            # Show all confirmations for this input set
+            if "ins_confirmations" in st.session_state and st.session_state["ins_confirmations"]:
+                with st.expander(f"✅ Approval / Confirmation History ({len(st.session_state['ins_confirmations'])} approvals)"):
+                    for idx, conf in enumerate(reversed(st.session_state["ins_confirmations"]), 1):
+                        st.markdown(f"**Approval #{len(st.session_state['ins_confirmations']) - idx + 1}** (Generation: `{conf.get('generation_id', 'N/A')[:8]}...`)")
+                        st.json(conf)
+                        if idx < len(st.session_state["ins_confirmations"]):
+                            st.markdown("---")
             
             # CDT Codes Section
             if cdt_codes:
                 st.markdown("---")
                 st.markdown("**🏥 Referenced CDT Codes (for administrative reference)**")
                 for code_info in cdt_codes:
-                    category_badge = "🔵" if code_info.get("category") == "primary" else "🟢"
-                    st.markdown(f"{category_badge} `{code_info['code']}` – {code_info['description']}")
+                    # Backward compatible:
+                    # - New API returns List[str]
+                    # - Old API returned List[dict] with code/description/category
+                    if isinstance(code_info, str):
+                        st.markdown(f"🟢 `{code_info}`")
+                        continue
+
+                    if isinstance(code_info, dict):
+                        category_badge = "🔵" if code_info.get("category") == "primary" else "🟢"
+                        code = code_info.get("code", "")
+                        desc = code_info.get("description", "")
+                        if desc:
+                            st.markdown(f"{category_badge} `{code}` – {desc}")
+                        else:
+                            st.markdown(f"{category_badge} `{code}`")
+                        continue
+
+                    st.markdown(f"🟢 `{str(code_info)}`")
                 
                 if metadata.get("cdt_notes"):
                     st.caption(f"ℹ️ {metadata['cdt_notes']}")

@@ -15,12 +15,12 @@ class TestStreamlitDemo:
     
     def test_streamlit_demo_file_exists(self):
         """Test that streamlit_demo.py exists."""
-        demo_file = Path("streamlit_demo.py")
+        demo_file = Path("../scripts/demo/streamlit_demo.py")
         assert demo_file.exists(), "streamlit_demo.py should exist"
     
     def test_streamlit_demo_imports(self):
         """Test that demo file has required imports."""
-        demo_file = Path("streamlit_demo.py")
+        demo_file = Path("../scripts/demo/streamlit_demo.py")
         content = demo_file.read_text(encoding="utf-8")
         
         # Check for required imports
@@ -30,7 +30,7 @@ class TestStreamlitDemo:
     
     def test_streamlit_demo_has_api_base_url(self):
         """Test that demo has API base URL configured."""
-        demo_file = Path("streamlit_demo.py")
+        demo_file = Path("../scripts/demo/streamlit_demo.py")
         content = demo_file.read_text(encoding="utf-8")
         
         assert "API_BASE_URL" in content
@@ -38,7 +38,7 @@ class TestStreamlitDemo:
     
     def test_streamlit_demo_has_page_config(self):
         """Test that demo has page configuration."""
-        demo_file = Path("streamlit_demo.py")
+        demo_file = Path("../scripts/demo/streamlit_demo.py")
         content = demo_file.read_text(encoding="utf-8")
         
         assert "st.set_page_config" in content
@@ -46,7 +46,7 @@ class TestStreamlitDemo:
     
     def test_streamlit_demo_has_input_fields(self):
         """Test that demo has input fields for case data."""
-        demo_file = Path("streamlit_demo.py")
+        demo_file = Path("../scripts/demo/streamlit_demo.py")
         content = demo_file.read_text(encoding="utf-8")
         
         # Check for key input fields
@@ -57,7 +57,7 @@ class TestStreamlitDemo:
     
     def test_streamlit_demo_has_generate_button(self):
         """Test that demo has generate button."""
-        demo_file = Path("streamlit_demo.py")
+        demo_file = Path("../scripts/demo/streamlit_demo.py")
         content = demo_file.read_text(encoding="utf-8")
         
         assert "st.button" in content
@@ -65,7 +65,7 @@ class TestStreamlitDemo:
     
     def test_streamlit_demo_makes_api_calls(self):
         """Test that demo makes API calls."""
-        demo_file = Path("streamlit_demo.py")
+        demo_file = Path("../scripts/demo/streamlit_demo.py")
         content = demo_file.read_text(encoding="utf-8")
         
         assert "requests.post" in content
@@ -73,7 +73,7 @@ class TestStreamlitDemo:
     
     def test_streamlit_demo_has_error_handling(self):
         """Test that demo has error handling."""
-        demo_file = Path("streamlit_demo.py")
+        demo_file = Path("../scripts/demo/streamlit_demo.py")
         content = demo_file.read_text(encoding="utf-8")
         
         assert "try:" in content or "except" in content
@@ -81,7 +81,7 @@ class TestStreamlitDemo:
     
     def test_streamlit_demo_has_documentation(self):
         """Test that demo has documentation/about section."""
-        demo_file = Path("streamlit_demo.py")
+        demo_file = Path("../scripts/demo/streamlit_demo.py")
         content = demo_file.read_text(encoding="utf-8")
         
         # Should have docstring or about section
@@ -89,7 +89,7 @@ class TestStreamlitDemo:
     
     def test_streamlit_demo_is_optional(self):
         """Test that demo is documented as optional."""
-        demo_file = Path("streamlit_demo.py")
+        demo_file = Path("../scripts/demo/streamlit_demo.py")
         content = demo_file.read_text(encoding="utf-8")
         
         # Should mention it's optional/demo

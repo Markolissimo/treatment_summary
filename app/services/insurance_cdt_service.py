@@ -20,9 +20,9 @@ class InsuranceCDTResult:
         self,
         codes: List[dict],
         notes: Optional[str] = None,
-    ):
-        self.codes = codes
-        self.notes = notes
+    ) -> None:
+        self.codes: List[dict] = codes
+        self.notes: Optional[str] = notes
 
     def to_list(self) -> List[dict]:
         """Convert to list for API responses."""

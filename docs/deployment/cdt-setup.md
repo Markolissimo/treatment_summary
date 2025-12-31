@@ -89,9 +89,8 @@ curl -X POST "http://localhost:8000/api/v1/generate-treatment-summary" \
 {
   "success": true,
   "document": {
-    "summary": "...",
-    "key_points": [...],
-    "next_steps": [...]
+    "title": "...",
+    "summary": "..."
   },
   "cdt_codes": {
     "primary_code": "D8090",
@@ -107,7 +106,7 @@ curl -X POST "http://localhost:8000/api/v1/generate-treatment-summary" \
 ### 6. Test with Streamlit Demo
 
 ```bash
-streamlit run streamlit_demo.py
+streamlit run scripts/demo/streamlit_demo.py
 ```
 
 The demo now includes:

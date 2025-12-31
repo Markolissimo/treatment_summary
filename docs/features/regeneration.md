@@ -153,7 +153,7 @@ CREATE TABLE audit_logs (
     user_id TEXT NOT NULL,
     document_type TEXT NOT NULL,
     input_data TEXT NOT NULL,
-    generated_text TEXT NOT NULL,
+    output_data TEXT NOT NULL,
     model_used TEXT DEFAULT 'gpt-4o',
     tokens_used INTEGER,
     generation_time_ms INTEGER,

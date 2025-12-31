@@ -105,8 +105,6 @@ class TestGenerateTreatmentSummary:
         mock_output = TreatmentSummaryOutput(
             title="Your Treatment Plan",
             summary="This is a test summary.",
-            key_points=["Point 1", "Point 2"],
-            next_steps=["Step 1", "Step 2"],
         )
         
         mock_response = MagicMock()
@@ -140,8 +138,6 @@ class TestGenerateTreatmentSummary:
         mock_output = TreatmentSummaryOutput(
             title="Test",
             summary="Test",
-            key_points=["Test"],
-            next_steps=["Test"],
         )
         
         mock_response = MagicMock()
@@ -168,8 +164,6 @@ class TestGenerateTreatmentSummary:
         mock_output = TreatmentSummaryOutput(
             title="Test",
             summary="Test",
-            key_points=["Test"],
-            next_steps=["Test"],
         )
         
         mock_response = MagicMock()
@@ -207,8 +201,6 @@ class TestGenerateTreatmentSummary:
         mock_output = TreatmentSummaryOutput(
             title="Test",
             summary="Test",
-            key_points=["Test"],
-            next_steps=["Test"],
         )
         
         mock_response = MagicMock()
@@ -238,8 +230,6 @@ class TestGenerateTreatmentSummary:
         mock_output = TreatmentSummaryOutput(
             title="Test",
             summary="Test",
-            key_points=["Test"],
-            next_steps=["Test"],
         )
         
         mock_response = MagicMock()
@@ -264,8 +254,6 @@ class TestGenerationResult:
         output = TreatmentSummaryOutput(
             title="Test",
             summary="Test summary",
-            key_points=["Point 1"],
-            next_steps=["Step 1"],
         )
         
         result = GenerationResult(
@@ -283,8 +271,6 @@ class TestGenerationResult:
         output = TreatmentSummaryOutput(
             title="Test",
             summary="Test",
-            key_points=["Test"],
-            next_steps=["Test"],
         )
         
         result = GenerationResult(

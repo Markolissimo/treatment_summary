@@ -22,3 +22,7 @@ README.md
 .vscode/
 .idea/
 *.toml
+streamlit_demo.py
+# Documentation and demos
+docs/
+scripts/

@@ -1,7 +1,7 @@
 """Schemas for document confirmation."""
 
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime
 
 
@@ -46,6 +46,22 @@ class DocumentConfirmationResponse(BaseModel):
     confirmed_at: datetime = Field(
         ...,
         description="Timestamp when the document was confirmed",
+    )
+    is_edited: bool = Field(
+        default=False,
+        description="Whether the approved content differs from the originally generated content",
+    )
+    edited_summary: Optional[str] = Field(
+        default=None,
+        description="Edited summary text (after value from before/after structure)",
+    )
+    similarity_score: Optional[float] = Field(
+        default=None,
+        description="Similarity score (0.0-1.0) between original generated summary and approved summary",
+    )
+    regeneration_history: Optional[List[str]] = Field(
+        default=None,
+        description="All generation UUIDs for the same user + same inputs",
     )
     message: str = Field(
         default="Document confirmed successfully",

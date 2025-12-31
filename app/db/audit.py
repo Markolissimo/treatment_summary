@@ -1,4 +1,5 @@
 import json
+import hashlib
 from datetime import datetime
 from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -6,12 +7,27 @@ from app.db.models import AuditLog, DOCUMENT_VERSIONS
 from app.core.phi_utils import prepare_audit_data
 
 
+def compute_input_hash(input_data: dict) -> str:
+    """Compute SHA256 hash of canonicalized input data for stable regeneration tracking."""
+    # Exclude regeneration-only fields so that "generate" and "regenerate" with the same
+    # clinical inputs share the same hash.
+
+    exclude_keys = {
+        "is_regeneration",
+        "previous_version_uuid",
+    }
+
+    filtered_input = {k: v for k, v in input_data.items() if k not in exclude_keys}
+    canonical_json = json.dumps(filtered_input, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(canonical_json.encode('utf-8')).hexdigest()
+
+
 async def log_generation(
     session: AsyncSession,
     user_id: str,
     document_type: str,
     input_data: dict,
-    generated_text: dict,
+    output_data: dict,
     model_used: str = "gpt-4o",
     tokens_used: Optional[int] = None,
     generation_time_ms: Optional[int] = None,
@@ -32,7 +48,7 @@ async def log_generation(
         user_id: ID of the user who initiated the generation
         document_type: Type of document (e.g., "treatment_summary")
         input_data: The input request data as a dictionary
-        generated_text: The generated document as a dictionary
+        output_data: The generated document output as a dictionary
         model_used: AI model used for generation
         tokens_used: Total tokens consumed
         generation_time_ms: Generation time in milliseconds
@@ -48,16 +64,20 @@ async def log_generation(
     # Get proper document version
     document_version = DOCUMENT_VERSIONS.get(document_type, "1.0")
     
+    # Compute input hash for stable regeneration tracking
+    input_hash = compute_input_hash(input_data)
+    
     # Apply PHI redaction if configured
     input_data_str = prepare_audit_data(input_data)
-    generated_text_str = prepare_audit_data(generated_text)
+    output_data_str = prepare_audit_data(output_data)
     
     audit_entry = AuditLog(
         user_id=user_id,
         document_type=document_type,
         document_version=document_version,
         input_data=input_data_str,
-        generated_text=generated_text_str,
+        input_hash=input_hash,
+        output_data=output_data_str,
         model_used=model_used,
         tokens_used=tokens_used,
         generation_time_ms=generation_time_ms,

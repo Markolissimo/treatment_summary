@@ -266,9 +266,7 @@ Request:
 {
   "confirmed_payload": {
     "title": "Edited title",
-    "summary": "Edited summary...",
-    "key_points": ["Point 1", "Point 2"],
-    "next_steps": ["Step 1", "Step 2"]
+    "summary": "Edited summary..."
   },
   "notes": "Approved with minor edits"
 }

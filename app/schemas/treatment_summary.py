@@ -112,22 +112,6 @@ class TreatmentSummaryOutput(BaseModel):
         ...,
         description="The main treatment summary text",
     )
-    key_points: list[str] = Field(
-        ...,
-        description="List of key points about the treatment",
-        min_length=1,
-        max_length=10,
-    )
-    next_steps: list[str] = Field(
-        ...,
-        description="List of next steps for the patient or staff",
-        min_length=1,
-        max_length=5,
-    )
-    care_instructions: Optional[list[str]] = Field(
-        default=None,
-        description="Care instructions (for patient-facing summaries)",
-    )
 
 
 class TreatmentSummaryResponse(BaseModel):

@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+import json
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.security import get_current_user
@@ -67,7 +68,9 @@ async def create_treatment_summary(
             user_id=user_id,
             document_type="treatment_summary",
             input_data=request.model_dump(),
-            generated_text=result.output.model_dump(),
+            output_data={
+                "treatment_summary": result.output.summary
+            },
             tokens_used=result.tokens_used,
             generation_time_ms=result.generation_time_ms,
             status="success",
@@ -100,7 +103,7 @@ async def create_treatment_summary(
             user_id=user_id,
             document_type="treatment_summary",
             input_data=request.model_dump(),
-            generated_text={},
+            output_data={},
             status="error",
             error_message=str(e),
         )
@@ -153,7 +156,10 @@ async def create_insurance_summary(
             user_id=user_id,
             document_type="insurance_summary",
             input_data=request.model_dump(),
-            generated_text=result.output.model_dump(),
+            output_data={
+                "insurance_summary": result.output.insurance_summary,
+                "cdt_codes": cdt_result.get_code_strings()
+            },
             tokens_used=result.tokens_used,
             generation_time_ms=result.generation_time_ms,
             status="success",
@@ -165,7 +171,7 @@ async def create_insurance_summary(
         return InsuranceSummaryResponse(
             success=True,
             document=result.output,
-            cdt_codes=cdt_result.to_list(),
+            cdt_codes=cdt_result.get_code_strings(),
             metadata={
                 "tokens_used": result.tokens_used,
                 "generation_time_ms": result.generation_time_ms,
@@ -187,7 +193,7 @@ async def create_insurance_summary(
             user_id=user_id,
             document_type="insurance_summary",
             input_data=request.model_dump(),
-            generated_text={},
+            output_data={},
             status="error",
             error_message=str(e),
         )
@@ -258,6 +264,23 @@ async def confirm_generated_document(
             notes=request.notes,
         )
         
+        # Parse edited_summary and regeneration_history from JSON
+        edited_summary_text = None
+        if confirmation.edited_summary:
+            try:
+                edited_data = json.loads(confirmation.edited_summary)
+                if isinstance(edited_data, dict):
+                    edited_summary_text = edited_data.get("after")  # Get the "after" text from before/after structure
+            except (json.JSONDecodeError, AttributeError):
+                pass
+        
+        regeneration_history_list = None
+        if confirmation.regeneration_history:
+            try:
+                regeneration_history_list = json.loads(confirmation.regeneration_history)
+            except (json.JSONDecodeError, AttributeError):
+                pass
+        
         return DocumentConfirmationResponse(
             success=True,
             confirmation_id=confirmation.id,
@@ -266,6 +289,10 @@ async def confirm_generated_document(
             document_type=confirmation.document_type,
             document_version=confirmation.document_version,
             confirmed_at=confirmation.confirmed_at,
+            is_edited=confirmation.is_edited,
+            edited_summary=edited_summary_text,
+            similarity_score=confirmation.similarity_score,
+            regeneration_history=regeneration_history_list,
         )
         
     except HTTPException:

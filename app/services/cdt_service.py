@@ -16,11 +16,11 @@ class CDTSelectionResult:
         primary_description: Optional[str] = None,
         suggested_add_ons: Optional[List[dict]] = None,
         notes: Optional[str] = None,
-    ):
-        self.primary_code = primary_code
-        self.primary_description = primary_description
-        self.suggested_add_ons = suggested_add_ons or []
-        self.notes = notes
+    ) -> None:
+        self.primary_code: Optional[str] = primary_code
+        self.primary_description: Optional[str] = primary_description
+        self.suggested_add_ons: List[dict] = suggested_add_ons or []
+        self.notes: Optional[str] = notes
 
     def to_dict(self) -> dict:
         """Convert to dictionary for API responses."""

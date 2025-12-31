@@ -40,7 +40,12 @@ class AuditLog(SQLModel, table=True):
         ...,
         description="JSON string of the input request data",
     )
-    generated_text: str = Field(
+    input_hash: Optional[str] = Field(
+        default=None,
+        index=True,
+        description="SHA256 hash of canonicalized input_data for stable regeneration tracking",
+    )
+    output_data: str = Field(
         ...,
         description="JSON string of the generated document",
     )
@@ -225,6 +230,23 @@ class DocumentConfirmation(SQLModel, table=True):
     confirmed_payload: Optional[str] = Field(
         default=None,
         description="JSON string of the final edited document (if modified by dentist)",
+    )
+    is_edited: bool = Field(
+        default=False,
+        description="Whether the approved content differs from the originally generated content",
+        index=True,
+    )
+    edited_summary: Optional[str] = Field(
+        default=None,
+        description="JSON string containing before/after summary text: {\"before\": \"original\", \"after\": \"edited\"}",
+    )
+    similarity_score: Optional[float] = Field(
+        default=None,
+        description="Similarity score (0.0-1.0) between original generated summary and approved summary",
+    )
+    regeneration_history: Optional[str] = Field(
+        default=None,
+        description="JSON string list of related generation UUIDs for the same user + same inputs",
     )
     pdf_generated_at: Optional[datetime] = Field(
         default=None,

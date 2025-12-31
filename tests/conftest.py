@@ -66,21 +66,6 @@ def mock_openai_response():
     return {
         "title": "Your Clear Aligner Treatment Plan",
         "summary": "You'll be using clear aligners to gently guide your teeth into their ideal positions over the next 4-6 months.",
-        "key_points": [
-            "Treatment duration: 4-6 months",
-            "Remote monitoring with occasional check-ins",
-            "Minimal attachments needed"
-        ],
-        "next_steps": [
-            "Wear aligners 22 hours per day",
-            "Upload progress photos weekly",
-            "Schedule first check-in in 4 weeks"
-        ],
-        "care_instructions": [
-            "Remove aligners when eating or drinking",
-            "Clean aligners daily with soft brush",
-            "Store in provided case when not wearing"
-        ]
     }
 
 

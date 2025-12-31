@@ -129,102 +129,10 @@ class TestTreatmentSummaryOutput:
         output = TreatmentSummaryOutput(
             title="Your Treatment Plan",
             summary="This is a summary of your treatment.",
-            key_points=["Point 1", "Point 2", "Point 3"],
-            next_steps=["Step 1", "Step 2"],
-            care_instructions=["Instruction 1", "Instruction 2"],
         )
         
         assert output.title == "Your Treatment Plan"
-        assert len(output.key_points) == 3
-        assert len(output.next_steps) == 2
-        assert len(output.care_instructions) == 2
-    
-    def test_output_without_care_instructions(self):
-        """Test output without optional care instructions."""
-        output = TreatmentSummaryOutput(
-            title="Your Treatment Plan",
-            summary="This is a summary.",
-            key_points=["Point 1"],
-            next_steps=["Step 1"],
-        )
-        
-        assert output.care_instructions is None
-    
-    def test_key_points_validation(self):
-        """Test key_points list validation."""
-        # Valid - 1 item
-        output = TreatmentSummaryOutput(
-            title="Title",
-            summary="Summary",
-            key_points=["Point 1"],
-            next_steps=["Step 1"],
-        )
-        assert len(output.key_points) == 1
-        
-        # Valid - 10 items
-        output = TreatmentSummaryOutput(
-            title="Title",
-            summary="Summary",
-            key_points=[f"Point {i}" for i in range(10)],
-            next_steps=["Step 1"],
-        )
-        assert len(output.key_points) == 10
-        
-        # Invalid - empty list
-        with pytest.raises(ValidationError):
-            TreatmentSummaryOutput(
-                title="Title",
-                summary="Summary",
-                key_points=[],
-                next_steps=["Step 1"],
-            )
-        
-        # Invalid - too many items
-        with pytest.raises(ValidationError):
-            TreatmentSummaryOutput(
-                title="Title",
-                summary="Summary",
-                key_points=[f"Point {i}" for i in range(11)],
-                next_steps=["Step 1"],
-            )
-    
-    def test_next_steps_validation(self):
-        """Test next_steps list validation."""
-        # Valid - 1 item
-        output = TreatmentSummaryOutput(
-            title="Title",
-            summary="Summary",
-            key_points=["Point 1"],
-            next_steps=["Step 1"],
-        )
-        assert len(output.next_steps) == 1
-        
-        # Valid - 5 items
-        output = TreatmentSummaryOutput(
-            title="Title",
-            summary="Summary",
-            key_points=["Point 1"],
-            next_steps=[f"Step {i}" for i in range(5)],
-        )
-        assert len(output.next_steps) == 5
-        
-        # Invalid - empty list
-        with pytest.raises(ValidationError):
-            TreatmentSummaryOutput(
-                title="Title",
-                summary="Summary",
-                key_points=["Point 1"],
-                next_steps=[],
-            )
-        
-        # Invalid - too many items
-        with pytest.raises(ValidationError):
-            TreatmentSummaryOutput(
-                title="Title",
-                summary="Summary",
-                key_points=["Point 1"],
-                next_steps=[f"Step {i}" for i in range(6)],
-            )
+        assert output.summary == "This is a summary of your treatment."
 
 
 class TestTreatmentSummaryResponse:
@@ -235,8 +143,6 @@ class TestTreatmentSummaryResponse:
         output = TreatmentSummaryOutput(
             title="Title",
             summary="Summary",
-            key_points=["Point 1"],
-            next_steps=["Step 1"],
         )
         
         response = TreatmentSummaryResponse(
@@ -254,8 +160,6 @@ class TestTreatmentSummaryResponse:
         output = TreatmentSummaryOutput(
             title="Title",
             summary="Summary",
-            key_points=["Point 1"],
-            next_steps=["Step 1"],
         )
         
         response = TreatmentSummaryResponse(document=output)
@@ -266,8 +170,6 @@ class TestTreatmentSummaryResponse:
         output = TreatmentSummaryOutput(
             title="Title",
             summary="Summary",
-            key_points=["Point 1"],
-            next_steps=["Step 1"],
         )
         
         response = TreatmentSummaryResponse(document=output)

@@ -1,6 +1,6 @@
 # BiteSoft AI Document Generation System
 
-**Version 0.2.0** | December 29, 2025
+**Version 0.2.0** | December 31, 2025
 
 AI-powered service for generating professional orthodontic documentation including treatment summaries and insurance summaries.
 
@@ -10,7 +10,10 @@ AI-powered service for generating professional orthodontic documentation includi
 
 | Version | Date | Module | Description |
 |---------|------|--------|-------------|
-| **0.2.0** | Dec 29, 2025 | Project | Added Insurance Summary module, security hardening, confirmation tracking |
+| **0.2.0** | Dec 31, 2025 | Project | Added Insurance Summary module, security hardening, confirmation tracking, output_data refactoring |
+| **0.1.0** | Dec 29, 2025 | Insurance Summary | Initial release: deterministic CDT logic, conservative tone, admin-facing |
+| **0.2.0** | Dec 26, 2025 | Treatment Summary | Production hardening: JWT auth, CORS config, PHI redaction, CDT validation |
+| **0.1.0** | Dec 25, 2025 | Treatment Summary | Initial release: patient-facing summaries with AI generation |
 
 ---
 
@@ -68,13 +71,6 @@ See [Deployment Guide](docs/deployment/README.md) for detailed instructions.
 - Regeneration support with seed-based versioning
 - Audit logging and confirmation tracking
 
-| Version | Date | Module | Description |
-|---------|------|--------|-------------|
-| **0.2.0** | Dec 26, 2025 | Treatment Summary | Production hardening: JWT auth, CORS config, PHI redaction, CDT validation |
-| **0.1.0** | Dec 25, 2025 | Treatment Summary | Initial release: patient-facing summaries with AI generation |
----
-
-
 ### Insurance Summary (v0.1.0)
 ✅ **Admin-facing insurance documentation**
 - Conservative, neutral tone (no diagnosis, no coverage promises)
@@ -82,12 +78,6 @@ See [Deployment Guide](docs/deployment/README.md) for detailed instructions.
 - Diagnostic asset tracking (D0350, D0330, D0210)
 - Required disclaimer for compliance
 - Regeneration support with version tracking
-
-| Version | Date | Module | Description |
-|---------|------|--------|-------------|
-| **0.1.0** | Dec 29, 2025 | Insurance Summary | Initial release: deterministic CDT logic, conservative tone, admin-facing |
-
----
 
 ### Security & Compliance (v0.2.0)
 ✅ **Production-ready hardening**
@@ -97,10 +87,6 @@ See [Deployment Guide](docs/deployment/README.md) for detailed instructions.
 - Document confirmation tracking
 - Enhanced CDT rule validation
 - Schema versioning in audit logs
-
-| Version | Date | Module | Description |
-|---------|------|--------|-------------|
-| **0.2.0** | Dec 29, 2025 | Project | Added Insurance Summary module, security hardening, confirmation tracking |
 
 ---
 
@@ -270,7 +256,31 @@ REDACT_PHI_FIELDS=false
 4. **Confirmation**: Portal calls `/api/v1/documents/{id}/confirm` when dentist approves
 5. **PDF Generation**: Portal handles PDF generation and email delivery
 
-### Example API Call
+### Example API Calls
+
+#### Treatment Summary
+
+```bash
+curl -X POST http://localhost:8000/api/v1/generate-treatment-summary \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <portal-jwt-token>" \
+  -d '{
+    "patient_name": "John Smith",
+    "practice_name": "BiteSoft Orthodontics",
+    "patient_age": 16,
+    "treatment_type": "clear aligners",
+    "area_treated": "both",
+    "duration_range": "4-6 months",
+    "case_difficulty": "moderate",
+    "monitoring_approach": "mixed",
+    "attachments": "some",
+    "whitening_included": false,
+    "audience": "patient",
+    "tone": "reassuring"
+  }'
+```
+
+#### Insurance Summary
 
 ```bash
 curl -X POST http://localhost:8000/api/v1/generate-insurance-summary \
@@ -288,6 +298,190 @@ curl -X POST http://localhost:8000/api/v1/generate-insurance-summary \
     }
   }'
 ```
+
+---
+
+## 🔄 Regeneration Guide (Frontend Integration)
+
+### Overview
+
+Both Treatment Summary and Insurance Summary endpoints support **regeneration** - generating a new version of the same document with different AI output while keeping the same inputs. This is useful when the dentist wants to see alternative phrasings or approaches.
+
+### How Regeneration Works
+
+**Backend Mechanism:**
+- Each generation uses a **seed value** to control AI randomness
+- First generation uses default seed (from config)
+- Regenerations increment the seed (`previous_seed + 1`)
+- Each generation gets a unique `uuid` that links to the audit log
+- Regenerations are tracked via `previous_version_uuid` chain
+
+### Frontend Implementation
+
+#### Step 1: Initial Generation
+
+**Request** (first time):
+```json
+{
+  "is_regeneration": false,
+  "tier": "moderate",
+  "patient_age": 25,
+  "treatment_type": "clear aligners",
+  "area_treated": "both",
+  "duration_range": "4-6 months",
+  "case_difficulty": "moderate",
+  "monitoring_approach": "mixed",
+  "attachments": "some",
+  "whitening_included": false,
+  "audience": "patient",
+  "tone": "reassuring"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "document": {
+    "title": "Your Clear Aligner Treatment Plan",
+    "summary": "..."
+  },
+  "uuid": "abc-123-def-456",  // ⚠️ SAVE THIS
+  "is_regenerated": false,
+  "seed": 42,
+  "cdt_codes": { ... },
+  "metadata": { ... }
+}
+```
+
+**Frontend Action:** Store the `uuid` from the response (e.g., in component state or session storage).
+
+#### Step 2: Regeneration Request
+
+When user clicks "Regenerate" button:
+
+**Request** (regeneration):
+```json
+{
+  "is_regeneration": true,  // ⚠️ Set to true
+  "previous_version_uuid": "abc-123-def-456",  // ⚠️ Use saved UUID
+  "tier": "moderate",  // ⚠️ SAME inputs as before
+  "patient_age": 25,
+  "treatment_type": "clear aligners",
+  "area_treated": "both",
+  "duration_range": "4-6 months",
+  "case_difficulty": "moderate",
+  "monitoring_approach": "mixed",
+  "attachments": "some",
+  "whitening_included": false,
+  "audience": "patient",
+  "tone": "reassuring"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "document": {
+    "title": "Clear Aligner Treatment Overview",  // Different output
+    "summary": "..."  // Different content
+  },
+  "uuid": "xyz-789-ghi-012",  // ⚠️ NEW UUID - save this for next regeneration
+  "is_regenerated": true,
+  "previous_version_uuid": "abc-123-def-456",
+  "seed": 43,  // Incremented seed
+  "cdt_codes": { ... },
+  "metadata": { ... }
+}
+```
+
+**Frontend Action:** Update stored `uuid` with the new one for potential future regenerations.
+
+#### Step 3: Multiple Regenerations
+
+You can chain regenerations indefinitely:
+
+```
+Generation 1 (uuid: A, seed: 42)
+    ↓
+Generation 2 (uuid: B, seed: 43, previous: A)
+    ↓
+Generation 3 (uuid: C, seed: 44, previous: B)
+    ↓
+...
+```
+
+Each regeneration uses the **previous generation's UUID** as `previous_version_uuid`.
+
+### Important Rules
+
+1. **Keep inputs identical**: Regeneration only works if all input fields (except `is_regeneration` and `previous_version_uuid`) are exactly the same as the original request.
+
+2. **Save the UUID**: Always store the `uuid` from each response - you'll need it for the next regeneration.
+
+3. **Don't reuse old UUIDs**: Each regeneration creates a new UUID. Always use the most recent one.
+
+4. **Backend validates**: The backend checks that `previous_version_uuid` exists in the audit log before allowing regeneration.
+
+### Example Frontend Code (React/TypeScript)
+
+```typescript
+const [currentUuid, setCurrentUuid] = useState<string | null>(null);
+const [formData, setFormData] = useState({ /* initial form values */ });
+
+// Initial generation
+const handleGenerate = async () => {
+  const response = await fetch('/api/v1/generate-treatment-summary', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      is_regeneration: false,
+      ...formData
+    })
+  });
+  
+  const data = await response.json();
+  setCurrentUuid(data.uuid);  // Save UUID for regeneration
+  // Display data.document to user
+};
+
+// Regeneration
+const handleRegenerate = async () => {
+  if (!currentUuid) return;  // No previous generation
+  
+  const response = await fetch('/api/v1/generate-treatment-summary', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      is_regeneration: true,
+      previous_version_uuid: currentUuid,  // Use saved UUID
+      ...formData  // Same inputs as before
+    })
+  });
+  
+  const data = await response.json();
+  setCurrentUuid(data.uuid);  // Update UUID for next regeneration
+  // Display new data.document to user
+};
+```
+
+### Regeneration History
+
+The backend tracks all regenerations in a chain. When you confirm a document, the confirmation record includes the full regeneration history:
+
+```json
+{
+  "confirmation_id": "...",
+  "generation_id": "xyz-789-ghi-012",
+  "regeneration_history": [
+    "abc-123-def-456",  // First generation
+    "xyz-789-ghi-012"   // Second generation (confirmed)
+  ]
+}
+```
+
+This allows you to see how many times a document was regenerated before approval.
 
 ---
 
@@ -352,7 +546,7 @@ Proprietary - BiteSoft Technologies
 ---
 
 **Project Version**: 0.2.0  
-**Last Updated**: December 29, 2025  
+**Last Updated**: December 31, 2025  
 **Python Version**: 3.11+  
 **FastAPI Version**: 0.109.0+  
 **OpenAI Model**: GPT-4o

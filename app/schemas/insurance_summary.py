@@ -104,9 +104,9 @@ class InsuranceSummaryResponse(BaseModel):
         ...,
         description="The generated insurance summary document",
     )
-    cdt_codes: List[dict] = Field(
+    cdt_codes: List[str] = Field(
         default_factory=list,
-        description="List of CDT codes with code and description",
+        description="List of CDT code strings (e.g., ['D8080', 'D0350', 'D0330'])",
     )
     metadata: dict = Field(
         default_factory=dict,

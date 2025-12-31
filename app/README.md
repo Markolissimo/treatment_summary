@@ -1,6 +1,6 @@
 # Application Module Documentation
 
-**Version 0.2.0** | December 29, 2025
+**Version 0.2.0** | December 31, 2025
 
 This directory contains the core application code for the BiteSoft AI Document Generation System.
 
@@ -177,8 +177,8 @@ class AuditLog(SQLModel, table=True):
     user_id: str              # User identifier
     document_type: str        # "treatment_summary" | "insurance_summary"
     document_version: str     # Schema version (v0.2.0)
-    input_data: str           # JSON string
-    generated_text: str       # JSON string
+    input_data: str           # JSON string of input request
+    output_data: str          # JSON string of document output
     tokens_used: int
     generation_time_ms: int
     created_at: datetime
@@ -249,7 +249,7 @@ async def log_generation(
     user_id: str,
     document_type: str,
     input_data: dict,
-    generated_text: dict,
+    output_data: dict,
     tokens_used: Optional[int] = None,
     generation_time_ms: Optional[int] = None,
     status: str = "success",
@@ -305,9 +305,6 @@ class TreatmentSummaryRequest(BaseModel):
 class TreatmentSummaryOutput(BaseModel):
     title: str
     summary: str
-    key_points: list[str]
-    next_steps: list[str]
-    care_instructions: Optional[list[str]]
 
 class TreatmentSummaryResponse(BaseModel):
     success: bool = True
@@ -342,12 +339,12 @@ class InsuranceSummaryRequest(BaseModel):
 
 class InsuranceSummaryOutput(BaseModel):
     insurance_summary: str
-    disclaimer: str
+    disclaimer: str  # Required disclaimer text
 
 class InsuranceSummaryResponse(BaseModel):
     success: bool = True
     document: InsuranceSummaryOutput
-    cdt_codes: List[dict]
+    cdt_codes: List[str]  # List of CDT code strings
     metadata: dict
     uuid: Optional[str]
     is_regenerated: bool
@@ -570,5 +567,5 @@ Each module has corresponding tests in `tests/`:
 
 ---
 
-**Last Updated**: December 29, 2025  
+**Last Updated**: December 31, 2025  
 **Application Version**: 0.2.0
